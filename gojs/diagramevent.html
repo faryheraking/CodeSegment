@@ -1,0 +1,220 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>DiagramEvent</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #4A9AFF;}
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Left,
+        allowDrop: true
+    });
+
+    diagram.add(mk(go.Node, "Auto",
+        mk(go.Shape, {figure: "Triangle", fill: "#3a3ccb", stroke: null, width: 50, height: 30}),
+        mk(go.TextBlock, {text: "Triangle", stroke: "#FFFFFF"})
+    ));
+
+    diagram.add(mk(go.Node, "Auto",
+        mk(go.Shape, {figure: "Dodecagon", fill: "#cb3e42", stroke: "transparent", width: 50, height: 50})
+    ));
+
+    diagram.add(mk(go.Part, "Auto",
+        mk(go.Shape, {figure: "AsteriskLine", fill: "transparent", stroke: "#c157cb"})
+    ))
+    /*
+    * 画板中节点开始动画布局时触发
+    * AnimationStarting 表示节点动画开始
+    */
+    diagram.addDiagramListener("AnimationStarting", function () {
+        console.log("animationStarting");
+    });
+    /*
+    * 画板中节点结束动画布局时触发
+    * AnimationFinished 也表示节点动画的结束
+    */
+    diagram.addDiagramListener("AnimationFinished", function () {
+        console.log("animationFinished");
+    });
+    /*
+    * 单击画布背景时触发，每次点击触发一次
+    */
+    diagram.addDiagramListener("BackgroundSingleClicked", function () {
+        console.log("backgroundSingleClicked");
+    });
+    /*
+    * 每次双击画板时触发
+    * 每次双击画板都会先触发 BackgroundSingleClicked
+    * 然后触发 BackgroundDoubleClicked
+    */
+    diagram.addDiagramListener("BackgroundDoubleClicked", function () {
+        console.log("backgroundDoubleClicked");
+    });
+    /*
+    * 右击画布背景时触发，每次右击触发一次
+    */
+    diagram.addDiagramListener("BackgroundContextClicked", function () {
+        console.log("backgroundContextClicked");
+    });
+    /*
+    * 每次选择节点Ctrl+C时触发
+    */
+    diagram.addDiagramListener("ClipboardChanged", function () {
+        console.log("clipboardChanged");
+    });
+    /*
+    * 每次Ctrl+V时触发
+    * 每次粘贴节点到画板都会依次触发 ChangingSlection、ChangedSelection、ClipboardPasted
+    * 然后触发 LayoutCompleted、Modified
+    */
+    diagram.addDiagramListener("ClipboardPasted", function () {
+        console.log("clipboardPasted");
+    });
+    /*
+    * 移动选择节点后（SelectionMoved后）触发，
+    * 然后触发 DocumentBoundsChanged
+    */
+    diagram.addDiagramListener("ViewportBoundsChanged", function () {
+        console.log("viewportBoundsChanged");
+    });
+    /*
+    * 移动选择节点后（SelectionMoved、ViewportBoundsChanged后）触发
+    */
+    diagram.addDiagramListener("DocumentBoundsChanged", function () {
+        console.log("documentBoundsChanged");
+    });
+    diagram.addDiagramListener("ExternalObjectsDropped", function () {
+        console.log("externalObjectsDropped");
+    });
+    /*
+    * 布局初始化完成触发
+    */
+    diagram.addDiagramListener("InitialLayoutCompleted", function () {
+        console.log("initialLayoutCompleted");
+    });
+    /*
+    * 布局完成时触发，它总是在布局初始化之后触发
+    */
+    diagram.addDiagramListener("LayoutCompleted", function () {
+        console.log("layoutCompleted");
+    });
+    diagram.addDiagramListener("LinkDrawn", function () {
+        console.log("linkDrawn");
+    });
+    diagram.addDiagramListener("LinkRelinked", function () {
+        console.log("linkRelinked");
+    });
+    diagram.addDiagramListener("LinkReshaped", function () {
+        console.log("linkReshaped");
+    });
+    /*
+    * 每当画板改变时触发
+    */
+    diagram.addDiagramListener("Modified", function () {
+        console.log("modified");
+    });
+    diagram.addDiagramListener("PartCreated", function () {
+        console.log("partCreated");
+    });
+    diagram.addDiagramListener("PartResized", function () {
+        console.log("partResized");
+    });
+    diagram.addDiagramListener("PartRotated", function () {
+        console.log("partRotated");
+    });
+    /*
+    * 选择节点改变时触发
+    * ChangingSelection事件后总是会触发ChangedSelection
+    * ChangingSelection事件并不总是代表真实的节点选择改变，即使未选择任何节点也会触发
+    * ChangingSelection事件总是代表用户执行了选择行为
+    */
+    diagram.addDiagramListener("ChangingSelection", function () {
+        console.log("changingSelection");
+    });
+    /*
+    * 选择节点改变后触发
+    * 只要 ChangingSelection 事件触发，随后就会触发 ChangedSelection
+    * 和 ChangingSelection 一样，总是代表用户执行了选择行为，但并不总是代表真实的节点选择改变
+    */
+    diagram.addDiagramListener("ChangedSelection", function () {
+        console.log("changedSelection");
+    });
+    /*
+    * 单击节点时触发
+    * 每次单击节点都会触发 ChangingSelection和ChangedSelection事件
+    * 最后触发 ObjectSingleClicked
+    */
+    diagram.addDiagramListener("ObjectSingleClicked", function (diagramEvent) {
+        console.log("objectSingleClicked");
+        var graphObject = diagramEvent.subject;
+        var partObject = graphObject.part;
+        var graphData = partObject.data;
+        console.log(graphData);
+    });
+    /*
+    * 每次双击节点时触发
+    * 每次双击节点都会依次触发 ChangingSelection、ChangedSelection、ObjectSingleClicked事件
+    * 最后触发 ObjectDoubleClicked
+    */
+    diagram.addDiagramListener("ObjectDoubleClicked", function () {
+        console.log("objectDoubleClicked");
+    });
+    /*
+    * 每次右击节点时触发
+    */
+    diagram.addDiagramListener("ObjectContextClicked", function () {
+        console.log("objectContextClicked");
+    });
+    /*
+    * 移动选择的节点时触发
+    * 如果设置了画板的contentAlignment选项，该事件触发后还会触发
+    * ViewportBoundsChanged和DocumentBoundsChanged事件
+    */
+    diagram.addDiagramListener("SelectionMoved", function () {
+        console.log("selectionMoved");
+    });
+    diagram.addDiagramListener("SelectionCopied", function () {
+        console.log("selectionCopied");
+    });
+    diagram.addDiagramListener("SelectionDeleting", function () {
+        console.log("selectionDeleting");
+    });
+    diagram.addDiagramListener("SelectionDeleted", function () {
+        console.log("selectionDeleted");
+    });
+    diagram.addDiagramListener("SelectionGrouped", function () {
+        console.log("selectionGrouped");
+    });
+    diagram.addDiagramListener("SelectionUngrouped", function () {
+        console.log("selectionUngrouped");
+    });
+    diagram.addDiagramListener("SubGraphCollapsed", function () {
+        console.log("subGraphCollapsed");
+    });
+    diagram.addDiagramListener("SubGraphExpanded", function () {
+        console.log("subGraphExpanded");
+    });
+    diagram.addDiagramListener("TextEdited", function () {
+        console.log("textEdited");
+    });
+    diagram.addDiagramListener("TreeCollapsed", function () {
+        console.log("treeCollapsed");
+    });
+    diagram.addDiagramListener("TreeExpanded", function () {
+        console.log("treeExpanded");
+    });
+
+</script>
+
+</body>
+</html>
