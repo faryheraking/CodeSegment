@@ -1,0 +1,86 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Port</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #00B45F;}
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        "toolManager.hoverDelay": 300,
+        "toolManager.toolTipDuration": 1000,
+        "undoManager.isEnabled": true,
+        allowDrop: true,
+        layout: mk(go.LayeredDigraphLayout, {columnSpacing: 10})
+    });
+    /*
+    * portId、fromPort、toPort、fromLinkable、toLinkable、toMaxLinks
+    * 可以应用到go.Node、go.Shape
+    */
+    diagram.nodeTemplate = mk(go.Node, {type: go.Panel.Auto},
+        mk(go.Shape, {figure: "Rectangle", fill: "#cb3c4f"}),
+        mk(go.Panel, "Table",
+            mk(go.RowColumnDefinition, {column: 0, alignment: go.Spot.Left}),
+            mk(go.RowColumnDefinition, {column: 2, alignment: go.Spot.Right}),
+            mk(go.TextBlock, {
+                stroke: "#CCC000",
+                column: 0, row: 0,
+                columnSpan: 3,
+                alignment: go.Spot.Center,
+                margin: new go.Margin(4, 2)
+            }, new go.Binding("text")),
+            mk(go.Panel, "Horizontal",
+                {column: 0, row: 1},
+                mk(go.Shape, {
+                    width: 6, height: 6,
+                    portId: "A", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
+                }),
+                mk(go.TextBlock, "A")
+            ),
+            mk(go.Panel, "Horizontal",
+                {column: 0, row: 2},
+                mk(go.Shape, {
+                    width: 6, height: 6,
+                    portId: "B", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
+                }),
+                mk(go.TextBlock, "B")
+            ),
+            mk(go.Panel, "Horizontal",
+                {column: 2, row: 1, rowSpan: 2},
+                mk(go.TextBlock, "Out"),
+                mk(go.Shape, {
+                    width: 6, height: 6,
+                    portId: "Out", fromSpot: go.Spot.Right, fromLinkable: true
+                })
+            )
+        )
+    );
+    diagram.linkTemplate = mk(go.Link, {
+            routing: go.Link.Orthogonal, corner: 3
+        },
+        mk(go.Shape),
+        mk(go.Shape, {fromArrow: "Chevron"}),
+        mk(go.Shape, {toArrow: "Standard"})
+    );
+    diagram.model = mk(go.GraphLinksModel, {
+        linkFromPortIdProperty: "fromPort",
+        linkToPortIdProperty: "toPort",
+        nodeDataArray: [
+            {key: "A", text: "AB"},
+            {key: "B", text: "BC"}
+        ],
+        linkDataArray: []
+    });
+</script>
+</body>
+</html>

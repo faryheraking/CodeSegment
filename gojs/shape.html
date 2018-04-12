@@ -5,9 +5,93 @@
     <meta name="viewport"
           content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>Document</title>
+    <title>Shape</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #00B45F;}
+    </style>
 </head>
 <body>
+<div id="root"></div>
+<h1>ShapeNames</h1>
+<div id="shape-keys"></div>
+<h1>ArrowNames</h1>
+<div id="arrow-keys"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Left,
+        "toolManager.toolTipDuration": 1000,
+        "toolManager.hoverDelay": 300,
+        allowDrop: true
+    });
 
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Horizontal
+        },
+        mk(go.Shape, {
+                width: 24, height: 24, stroke: null,
+                portId: "", fromLinkable: true, toLinkable: true, cursor: "pointer"
+            },
+            /*
+            * go.Binding(geometryProperty,dataKey,conversionFn(v))
+            * 如果dataKey为非空，则conversionFn参数为dataKey的值
+            * 如果dataKey为空，则conversionFn参数为当前数据项
+            * 不论dataKey是否为空，conversionFn返回值为最高优先级赋值给geometryProperty
+            */
+            new go.Binding("figure"), new go.Binding("fill", "", function (v) {
+                return "rgb(" + Math.ceil(Math.random() * 255) + "," + Math.ceil(Math.random() * 255) + "," + Math.ceil(Math.random() * 255) + ")";
+            })
+        )
+    );
+
+    diagram.linkTemplate = mk(go.Link,
+        mk(go.Shape),
+        mk(go.Shape, {fill: "blue", fromArrow: "StretchedDiamond"}),
+        mk(go.Shape, {fill: "red", toArrow: "StretchedDiamond"})
+    );
+
+    diagram.model = mk(go.GraphLinksModel, {
+        nodeDataArray: [
+            // 矩形组
+            {key: 1, figure: "Rectangle", arrow: "StretchedDiamond"},
+            {key: 2, figure: "RoundedRectangle", arrow: "StretchedDiamond"},
+            // 圆形组
+            {key: 3, figure: "Circle", arrow: "BackwardTriangle"},
+            {key: 4, figure: "Ellipse", arrow: "Boomerang"},
+            // 三角形组
+            {key: 5, figure: "TriangleRight", arrow: "BackwardBoomerang"},
+            {key: 6, figure: "TriangleLeft", arrow: "SidewaysV"},
+            {key: 7, figure: "TriangleUp", arrow: "BackwardV"},
+            {key: 8, figure: "TriangleDown", arrow: "OpenTriangle"},
+            {key: 9, figure: "Square", arrow: "BackwardHalfTriangleTop"},
+            {key: 10, figure: "Line1", arrow: "HalfTriangleBottom"},
+            {key: 11, figure: "Line2", arrow: "CircleLineFork"},
+            {key: 12, figure: "LineH", arrow: "ConcaveTailArrow"},
+            {key: 13, figure: "LineV", arrow: "RoundedTriangle"},
+            {key: 14, figure: "Triangle", arrow: "OpenRightTriangleBottom"},  // 向上的三角形，相当于 TriangleUp
+            {key: 15, figure: "Diamond", arrow: "CircleLine"},  // 菱形
+            {key: 16, figure: "FivePointedStar", arrow: "DoubleLineCircle"},
+            {key: 17, figure: "SixPointedStar", arrow: "TripleForwardSlash"},
+            {key: 18, figure: "SevenPointedStar", arrow: "Feather"},
+            {key: 19, figure: "EightPointedStar", arrow: "CircleFork"},
+            {key: 20, figure: "NinePointedStar", arrow: "ForwardSemiCircle"},
+            {key: 21, figure: "TenPointedStar", arrow: "BackwardTripleFeathers"}
+        ],
+        linkDataArray: [
+            {from: 1, to: 2}
+        ]
+    });
+
+    var shapeKeys = [], arrowKeys = [];
+    go.Shape.getFigureGenerators().toArray().forEach(function (o) {
+        shapeKeys.push(o.key);
+    });
+    go.Shape.getArrowheadGeometries().toArray().forEach(function (o) {
+        arrowKeys.push(o.key);
+    });
+    document.getElementById("shape-keys").innerText = shapeKeys.join(" , ");
+    document.getElementById("arrow-keys").innerText = arrowKeys.join(" , ");
+</script>
 </body>
 </html>

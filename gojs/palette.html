@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Palette</title>
+    <script src="libs/go-debug-p.js"></script>
+</head>
+<body>
+<div style="position:relative;">
+    <div id="root" style="width:100%;height:300px;background:#000099;"></div>
+    <div id="palette" style="width:100px;height:300px;position:absolute;left:0;top:0;background:#6D1212;"></div>
+</div>
+
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        "toolManager.toolTipDuration": 1000,
+        "toolManager.hoverDelay": 300,
+        allowDrop: true,  // 允许拖放
+        "undoManager.isEnabled": true,  // 允许回退
+    });
+
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Auto,
+            toolTip: mk(go.Adornment, "Auto",
+                mk(go.Shape, {fill: "#FFFFFF", stroke: "#882299", width: 60, height: 40}),
+                mk(go.TextBlock, {stroke: "#770099"}, new go.Binding("text", "key"))
+            )
+        },
+        mk(go.Shape, {
+            figure: "Ellipse", width: 100, height: 60, fill: "#FFFFFF",
+            portId: "", fromLinkable: true, toLinkable: true, cursor: "pointer"
+        }, new go.Binding("fill", "color")),
+        mk(go.TextBlock, {stroke: "#771122"}, new go.Binding("text", "key"))
+    );
+    /*
+    * go.Palette 定义
+    */
+    var palette = mk(go.Palette, "palette", {
+        initialScale: 0.5,
+        layout: mk(go.GridLayout, {
+            alignment: go.GridLayout.LeftToRight
+        })
+    });
+    palette.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
+        mk(go.Shape, {figure: "Rectangle", fill: "transparent", stroke: "#cccccc", width: 20, height: 20}),
+        mk(go.TextBlock, {}, new go.Binding("stroke", "color"), new go.Binding("text", "key"))
+    );
+    palette.model = mk(go.Model, {
+        nodeDataArray: [
+            {key: "C", color: "cyan"},
+            {key: "LC", color: "lightcyan"},
+            {key: "A", color: "aquamarine"},
+            {key: "T", color: "turquoise"},
+            {key: "PB", color: "powderblue"},
+            {key: "LB", color: "lightblue"},
+            {key: "LSB", color: "lightskyblue"},
+            {key: "DSB", color: "deepskyblue"}
+        ]
+    });
+    palette.nodeTemplateMap = diagram.nodeTemplateMap;  // 让palette中的显示与diagram中相同
+</script>
+</body>
+</html>

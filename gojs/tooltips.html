@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>toolTip</title>
+    <script src="libs/go-debug-p.js"></script>
+</head>
+<body>
+<div id="root" style="width:100%;height:300px;background:#EEEEEE;"></div>
+<div id="root1" style="width:100%;height:300px;background:#EEEEEE;"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        "toolManager.hoverDelay": 300,  //设置提示信息显示延迟
+        "toolManager.toolTipDuration": 1000,  // 设置提示信息显示停留时长
+    });
+    // go.Node可以有自己的toolTip
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Auto,
+            toolTip: mk(go.Adornment, "Spot", {
+                    background: "transparent"  // 避免鼠标移动时提示信息隐藏
+                },
+                mk(go.Shape, {fill: "#FFFFFF", width: 100, height: 20}, new go.Binding("stroke", "text")),
+                mk(go.TextBlock, {margin: 6}, new go.Binding("stroke", "text"), new go.Binding("text", "", function (data) {
+                        // data 为 nodeDataArray数据项
+                        return data.tip;
+                    })
+                )
+            )
+        },
+        mk(go.Shape, {
+            figure: "RoundedRectangle", stroke: "transparent",
+            width: 200, height: 40
+        }, new go.Binding("fill")),
+        mk(go.TextBlock, {stroke: "#FFFFFF"}, new go.Binding("text"))
+    );
+
+    diagram.toolTip = mk(go.Adornment, "Auto",
+        mk(go.Shape, {fill: "#FFFFFF", width: 100, height: 40}, new go.Binding("stroke", "text")),
+        mk(go.TextBlock, {margin: 6, text: "diagram"}, new go.Binding("stroke", "text"))
+    );
+    diagram.model = mk(go.Model, {
+        nodeDataArray: [
+            {key: 1, text: "red", fill: "red", tip: "复制"},
+            {key: 2, text: "green", fill: "green", tip: "粘贴"},
+            {key: 3, text: "blue", fill: "blue", tip: "剪切"}
+        ]
+    });
+
+    diagram1 = mk(go.Diagram, "root1", {
+        contentAlignment: go.Spot.Center,
+        "toolManager.hoverDelay": 300,
+        "toolManager.toolTipDuration": 1000
+    });
+
+    diagram1.nodeTemplate = mk(go.Node, "Auto", {
+            toolTip: mk(go.Adornment, "Spot", {background: "transparent"},
+                mk(go.Placeholder, {padding: 5}),
+                mk(go.TextBlock, {
+                    stroke: "blue",
+                    alignment: go.Spot.Top,
+                    alignmentFocus: go.Spot.Bottom
+                }, new go.Binding("text", "tipa")),
+                mk(go.TextBlock, {
+                    stroke: "green",
+                    alignment: go.Spot.Bottom,
+                    alignmentFocus: go.Spot.Top
+                }, new go.Binding("text", "tipb"))
+            )
+        },
+        mk(go.Shape, "Circle", {
+            fill: "#FFFFFF", stroke: "red",
+            width: 100, height: 100
+        }),
+        mk(go.TextBlock, {stroke: "red"}, new go.Binding("text"))
+    )
+    ;
+    diagram1.model = mk(go.Model, {
+        nodeDataArray: [
+            {key: 1, text: "tool-tip-one", tipa: "aa", tipb: "bb"},
+            {key: 2, text: "tool-tip-two", tipa: "ab", tipb: "ba"}
+        ]
+    });
+</script>
+</body>
+</html>

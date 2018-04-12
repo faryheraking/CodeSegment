@@ -1,0 +1,99 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Diagram</title>
+    <script src="libs/go-debug-p.js"></script>
+</head>
+<body>
+<div id="root" style="width:100%;height:300px;"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var dg = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        /*
+        * go.Diagram.DocumentScroll 滚动到文档边缘，默认值
+        * go.Diagram.InfiniteScroll 无限滚动
+        */
+        scrollMode: go.Diagram.DocumentScroll
+    });
+    dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
+        mk(go.Panel, {type: go.Panel.Auto},
+            mk(go.Shape, {figure: "Rectangle", stroke: "#996644", fill: null, width: 100, height: 100}),
+            mk(go.TextBlock, new go.Binding("text", "text"))
+        )
+    );
+
+    dg.linkTemplate = mk(go.Link, {},
+        mk(go.Shape),
+        mk(go.Shape, {toArrow: "Boomerang"})
+    );
+    dg.model = mk(go.Model, {
+        nodeDataArray: [
+            {text: "x"},
+            {text: "y"}
+        ]
+    });
+
+    dg.groupTemplate = mk(go.Group, "Auto", {
+            /*
+            * go.LayeredDigraphLayout.direction
+            * 0 右 90 下 180 左 270 上
+            *
+            * go.LayeredDigraphLayout.columnSpacing
+            * 列间距，默认25
+            */
+            layout: mk(go.LayeredDigraphLayout, {direction: 0, columnSpacing: 0})
+        },
+        mk(go.Shape, {figure: "Rectangle", fill: "green"}),
+        mk(go.Panel, {type: go.Panel.Vertical, defaultAlignment: go.Spot.Center},
+            mk(go.Panel, {type: go.Panel.Horizontal, defaultAlignment: go.Spot.Left},
+                mk("SubGraphExpanderButton"),
+                mk(go.TextBlock, {text: "test"})
+            )
+        ),
+        mk(go.Placeholder, {
+            padding: new go.Margin(0, 10),
+            background: "#FFFFFF"
+        })
+    );
+
+    dg.groupTemplate =
+        mk(go.Group, "Auto",
+            {layout: mk(go.TreeLayout)},
+            mk(go.Shape, "Rectangle", {fill: "orange", stroke: "darkorange"}),
+            mk(go.Panel, "Table", {margin: 0.5},
+                mk(go.RowColumnDefinition, {row: 0, background: "white"}),  // header is white
+                mk("SubGraphExpanderButton", {row: 0, column: 0, margin: 3}),
+                mk(go.TextBlock, {
+                        row: 0, column: 1, font: "bold 14px Sans-Serif", stroke: "darkorange",
+                        textAlign: "center", stretch: go.GraphObject.UniformToFill
+                    },
+                    new go.Binding("text")),
+                mk(go.Placeholder, {row: 1, columnSpan: 2, padding: 10, alignment: go.Spot.TopLeft},
+                    new go.Binding("padding", "isSubGraphExpanded",
+                        function (exp) {
+                            return exp ? 10 : 0;
+                        }).ofObject())
+            )
+        );
+
+    dg.layout = mk(go.TreeLayout, {isRealtime: false});
+
+    dg.model = new go.GraphLinksModel([
+        {key: 1, text: "Alpha"},
+        {key: 2, text: "GROUP", isGroup: true},
+        {key: 3, text: "Beta", group: 2},
+        {key: 4, text: "Gamma", group: 2},
+        {key: 5, text: "Delta"}
+    ], [
+        {from: 1, to: 3},
+        {from: 3, to: 4},
+        {from: 1, to: 5}
+    ]);
+</script>
+</body>
+</html>

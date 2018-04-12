@@ -1,0 +1,77 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>itemArray</title>
+    <script src="libs/go-debug-p.js"></script>
+</head>
+<body>
+<div id="item-array" style="width:100%;height:500px;"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "item-array", {
+        /*内容始终居中*/
+        contentAlignment: go.Spot.Center,
+        commandHandler: new go.CommandHandler(),
+        /*右击时触发*/
+        contextClick: function () {
+            console.log("context-click");
+        },
+        /*仅在点击画板时执行一次*/
+        click: function (inputEvent) {
+            console.log("click", inputEvent);
+        }
+    });
+    diagram.addDiagramListener("BackgroundSingleClicked", function (inputEvent) {
+        console.log("BackgroundSingleClicked", inputEvent);
+    });
+    diagram.nodeTemplate = mk(go.Node, {type: go.Panel.Vertical},
+        new go.Binding("itemArray", "items"), {
+            itemTemplate: mk(go.Panel, {type: go.Panel.Auto},
+                mk(go.Shape, {figure: "Rectangle", fill: "#990099"}),
+                /*
+                * new go.Binding("text", "") 是必须的，且不能是其它值
+                */
+                mk(go.TextBlock, {margin: 5, stroke: "#ffffff"}, new go.Binding("text", ""))
+            )
+        }
+    );
+    diagram.contextMenu =
+        mk(go.Adornment, "Vertical",
+            mk("ContextMenuButton",
+                mk(go.TextBlock, "Undo"),
+                {
+                    click: function (e, obj) {
+                        e.diagram.commandHandler.undo();
+                    }
+                },
+                new go.Binding("visible", "", function (o) {
+                    return o.diagram.commandHandler.canUndo();
+                }).ofObject()),
+            mk("ContextMenuButton",
+                mk(go.TextBlock, "Redo"),
+                {
+                    click: function (e, obj) {
+                        e.diagram.commandHandler.redo();
+                    }
+                },
+                new go.Binding("visible", "", function (o) {
+                    return o.diagram.commandHandler.canRedo();
+                }).ofObject())
+        );
+    console.log("diagram-viewportBounds", diagram.viewportBounds);
+    diagram.model = mk(go.GraphLinksModel, {
+        nodeDataArray: [
+            {key: "a", items: ["red", "green"]},
+            {key: "b", items: ["green", "blue", "yellow"]}
+        ],
+        linkDataArray: [
+            {from: "a", to: "b"}
+        ]
+    });
+</script>
+</body>
+</html>

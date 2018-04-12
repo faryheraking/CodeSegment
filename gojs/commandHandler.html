@@ -1,0 +1,52 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>CommandHandler</title>
+    <script src="libs/go-debug-p.js"></script>
+</head>
+<body>
+<div id="root" style="width:100%;height:300px;background:#EEEEEE;"></div>
+<p id="msg"></p>
+<script>
+    var msg = document.getElementById("msg");
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        // 画板点击事件
+        click: function () {
+            alert(1);
+        },
+        //commandHandler: go.CommandHandler.cutSelection()
+    });
+
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Auto,
+            // 节点点击事件
+            click: function (e, obj) {
+                var evt = e.copy();
+                var node = obj.part;
+                var key = node.data.key, text = node.data.text;
+                msg.textContent = key + "" + text;
+                var currentSelectedNodes = diagram.selection;  // 当前选择的所有节点
+                var node2 = diagram.findNodeForKey(key);  // 根据数据key查找节点
+                var node3 = diagram.findNodesByExample({key: key});  // 返回一个Iterator
+            }
+        },
+        mk(go.Shape, {figure: "Rectangle", width: 200, height: 50, fill: "#cccccc", stroke: "#cc0000"}),
+        mk(go.TextBlock, {stroke: "#660099"}, new go.Binding("text", "text"))
+    );
+
+    diagram.model = mk(go.Model, {
+        nodeDataArray: [
+            {key: "a", text: "a"},
+            {key: "b", text: "b"}
+        ]
+    });
+
+</script>
+</body>
+</html>
