@@ -1,0 +1,82 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Copy Past Cut</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #CCCCCC;}
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagramOption = {
+        contentAlignment: go.Spot.Center,
+        "undoManager.isEnabled": true,
+        allowDrop: true
+    };
+    var diagram = mk(go.Diagram, "root", diagramOption);
+
+    diagram.addDiagramListener("ClipboardChanged", function (e) {
+        console.log("clipboard-changed", e);
+    });
+
+    diagram.add(mk(go.Part, "Auto", {
+            selectable: false,
+            click: function (inputEvent, graphObject) {
+                inputEvent.diagram.commandHandler.copySelection();
+            }
+        },
+        mk(go.Shape, "Rectangle", {width: 80, height: 36, fill: "#3a3ccb", stroke: "#3a3ccb"}),
+        mk(go.TextBlock, "复制", {margin: 3, stroke: "#FFFFFF"})
+    ));
+    diagram.add(mk(go.Part, "Auto", {
+            selectable: false,
+            click: function (inputEvent, graphObject) {
+                inputEvent.diagram.commandHandler.cutSelection();
+            }
+        },
+        mk(go.Shape, "Rectangle", {width: 80, height: 36, fill: "#3a3ccb", stroke: "#3a3ccb"}),
+        mk(go.TextBlock, "剪切", {margin: 3, stroke: "#FFFFFF"})
+    ));
+    diagram.add(mk(go.Part, "Auto", {
+            selectable: false,
+            click: function (inputEvent, graphObject) {
+                inputEvent.diagram.commandHandler.pasteSelection();
+            }
+        },
+        mk(go.Shape, "Rectangle", {width: 80, height: 36, fill: "#3a3ccb", stroke: "#3a3ccb"}),
+        mk(go.TextBlock, "粘贴", {margin: 3, stroke: "#FFFFFF"})
+    ));
+
+    diagram.add(mk(go.Part, "Auto", {
+            selectable: false,
+            click: function (inputEvent, graphObject) {
+                inputEvent.diagram.commandHandler.deleteSelection();
+            }
+        },
+        mk(go.Shape, "Rectangle", {width: 80, height: 36, fill: "#3a3ccb", stroke: "#3a3ccb"}),
+        mk(go.TextBlock, "删除", {margin: 3, stroke: "#FFFFFF"})
+    ));
+
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Auto
+        },
+        mk(go.Shape, {width: 100, height: 36, fill: "#54cbb8", stroke: null}, new go.Binding("figure")),
+        mk(go.TextBlock, {stroke: "#CCFFCC"}, new go.Binding("text", "figure"))
+    );
+
+    diagram.model = mk(go.Model, {
+        nodeDataArray: [
+            {key: 1, figure: "Card"},  // 卡片
+            {key: 2, figure: "MagneticTape"}  // 对话气泡
+        ]
+    });
+</script>
+</body>
+</html>
