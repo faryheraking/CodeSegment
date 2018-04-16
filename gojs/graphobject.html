@@ -1,0 +1,222 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>GraphObject</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #4A9AFF;}
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+    var overtime = 0;
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        allowDrop: true,
+        "toolManager.holdDelay": 300,  // 鼠标在节点上停留触发mouseHold延迟时间
+        "toolManager.hoverDelay": 300,  // go.Adornment 开始显示延迟时间
+        "toolManager.toolTipDuration": 1000,  // go.Adornment 显示停留时间
+        "undoManager.isEnabled": true,  // 是否允许回退操作
+    });
+    /*
+    * 回退功能
+    */
+    diagram.add(mk(go.Node, "Auto", {
+            /*
+            * 鼠标点击节点时触发
+            */
+            click: function (inputEvent, graphObject) {
+                console.log("click");
+                /*
+                * graphObject.part.data 返回节点绑定的数据
+                * 如果节点没有绑定的数据，则返回null
+                */
+                var data = graphObject.part.data;
+                console.log("data=" + data);
+
+                /*
+                * diagram 返回当前事件所在的画板对象
+                * commandHandler 返回当前画板的go.CommandHandler实例
+                * undo() 取消上一步操作，每调用一次则回退一步操作
+                */
+                var diagram = inputEvent.diagram;
+                var ch = diagram.commandHandler;
+                ch.undo();
+            },
+            /*
+            * 鼠标双击节点时触发
+            * 触发 doubleClick 事件前总是会先触发 click 事件
+            */
+            doubleClick: function (inputEvent, graphObject) {
+                console.log("double-click");
+            },
+            /*
+            * 鼠标右击节点时触发
+            * 鼠标在较短时间内连续右击只会触发一次 contextClick 事件
+            */
+            contextClick: function (inputEvent, graphObject) {
+                console.log("context-click");
+            }
+        },
+        mk(go.Shape, {name: "_htShape", figure: "RoundedRectangle", fill: null, stroke: "#CCCCCC"}),
+        mk(go.TextBlock, {name: "_htText", text: "回退", stroke: "#c157cb"})
+    ));
+    /*
+    * 恢复功能
+    */
+    diagram.add(mk(go.Node, "Auto", {
+            click: function (inputEvent, graphObject) {
+                var diagram = inputEvent.diagram;
+                var ch = diagram.commandHandler;
+                ch.redo();
+            }
+        },
+        mk(go.Shape, {name: "_qjShape", figure: "RoundedRectangle", fill: null, stroke: "#CCCCCC"}),
+        mk(go.TextBlock, {name: "_qjText", text: "恢复", stroke: "#c157cb"})
+    ));
+    diagram.add(mk(go.Node, "Auto",
+        mk(go.Shape, {
+            figure: "BpmnEventEscalation", width: 50, height: 50, fill: "#3a3ccb", stroke: "transparent"
+        }),
+        mk(go.TextBlock, {text: "BpmnEventEscalation", stroke: "#EFEFEF"})
+    ));
+
+    diagram.add(mk(go.Node, "Auto", {
+            click: function (inputEvent, graphObject) {
+                /*
+                * findObject(graphObjectName) 在当前节点中查找指定名称的子节点
+                * 还可以通过 graphObject.part.elt(index) 在当前节点中查找指定索引的子节点
+                */
+                var textObj = graphObject.part.findObject("_rectangleText");
+                if (textObj) {
+                    textObj.font = "bold " + (Math.ceil(Math.random() * 16) + 12) + "px sans-serif";
+                }
+                /*
+                * inputEvent.targetObject 返回事件触发点的目标节点
+                */
+                var targetObject = inputEvent.targetObject;
+                /*
+                * clickCount 1 单击 2 双击
+                */
+                var clickCount = inputEvent.clickCount;
+                if (clickCount === 1) {
+                    console.log("单击");
+                }
+                if (clickCount === 2) {
+                    console.log("双击");
+                }
+                /*
+                * diagram 返回InputEvent相关的画板对象
+                */
+                var diagram = inputEvent.diagram;
+                /*
+                * documentPoint 返回一个go.Point实例对象
+                * 代表事件触发点相对于当前节点的坐标
+                * viewPoint 返回一个go.Point实例对象
+                * 代表事件触发点相对于当前画板的坐标
+                */
+                var point = inputEvent.documentPoint;
+                var vpoint = inputEvent.viewPoint;
+                console.log(point.x, point.y, vpoint.x, vpoint.y);
+                /*
+                * event 返回原生事件实例对象，
+                * 如果是原生不支持的事件，则返回null
+                */
+                var event = inputEvent.event;
+                console.log(event.clientX, event.clientY);
+                /*
+                * timestamp 返回事件发生JavaScript时间戳
+                */
+                var time = inputEvent.timestamp;
+                console.log(time);
+                /*
+                * down 判断是否为键盘keydown事件
+                * up 判断是否为键盘keyup事件
+                */
+                var isKeyDown = inputEvent.down;
+                var isKeyUp = inputEvent.up;
+                console.log(isKeyDown, isKeyUp);
+
+            },
+            /*
+            * 当前节点被选择或取消选择时触发
+            * 回调函数是一个go.Part实例，它包含当前节点的所有子节点
+            * elt(index) 返回指定索引的子节点
+            * isSelected 返回当前节点是否处理选中状态
+            */
+            selectionChanged: function (part) {
+                console.log("selection-changed");
+                var shape = part.elt(0);
+                shape.fill = part.isSelected ? "red" : "blue";
+            }
+        },
+        mk(go.Shape, {
+            name: "_rectangleShape", figure: "Rectangle",
+            width: 200, height: 50, fill: "blue", stroke: null,
+            /*
+            * 拖动其它节点到当前节点时触发
+            * 回调函数接受InputEvent实例和GraphObject实例
+            * 所有鼠标和键盘事件都属于InputEvent事件
+            */
+            mouseDragEnter: function (inputEvent, graphObject) {
+                console.log("mouse-drag-enter");
+            },
+            /*
+            * 拖动其它节点从当前节点离开时触发
+            */
+            mouseDragLeave: function (inputEvent, graphObject) {
+                console.log("mouse-drag-leave");
+            },
+            /*
+            * 拖动其它节点放到当前节点上时触发
+            */
+            mouseDrop: function (inputEvent, graphObject) {
+                console.log("mouse-drop");
+            },
+            /*
+            * 鼠标在当前节点上按住键（左、中、右）时触发
+            * 触发时机受 toolManager.holdDelay 设置决定
+            */
+            mouseHold: function (inputEvent, graphObject) {
+                console.log("mouse-hold");
+            },
+            /*
+            * 鼠标停留在当前节点上方时触发
+            * 停留指停止移动一段时间
+            * 每次停留都会触发一次
+            */
+            mouseHover: function (inputEvent, graphObject) {
+                console.log("mouse-hover");
+            },
+            /*
+            * 鼠标离开节点时触发
+            */
+            mouseLeave: function (inputEvent, graphObject) {
+                console.log("mouse-leave");
+            },
+            /*
+            * 鼠标位于节点上时连续的触发
+            * 节点上层有其它节点时，鼠标移动到其它节点会触发 mouseLeave 事件
+            */
+            mouseOver: function (inputEvent, graphObject) {
+                if (!overtime) {
+                    overtime = 1;
+                    console.log("mouse-over");
+                }
+
+            }
+        }),
+        mk(go.TextBlock, {
+            name: "_rectangleText",
+            text: "Rectangle", stroke: "#EEEEEE", font: "bold 16px sans-serif"
+        })
+    ));
+</script>
+</body>
+</html>

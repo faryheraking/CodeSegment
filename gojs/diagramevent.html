@@ -119,9 +119,20 @@
     });
     /*
     * 每当画板改变时触发
+    * 可以用于添加标识，提示用户保存数据
     */
-    diagram.addDiagramListener("Modified", function () {
-        console.log("modified");
+    diagram.addDiagramListener("Modified", function (diagramEvent) {
+        var isModified = diagram.isModified;
+        console.log("modified", isModified);
+        if (isModified) {
+            // 画板有变更
+            document.title += " *";
+        } else {
+            var starIndex;
+            if (starIndex = document.title.indexOf("*") > 0) {
+                document.title = document.title.substring(0, starIndex - 1);
+            }
+        }
     });
     diagram.addDiagramListener("PartCreated", function () {
         console.log("partCreated");

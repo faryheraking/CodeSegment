@@ -1,0 +1,74 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Diagram Zoom</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #4A9AFF;}
+    </style>
+</head>
+<body>
+
+<div id="root"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.Center,
+        /*
+        * 初始化画板时自动缩放画板以适配内容
+        * 如果允许用户缩放画板，就不能设置 autoScale为非go.Diagram.None
+        */
+        initialAutoScale: go.Diagram.Uniform,
+        minScale: 0.1,
+        maxScale: 10,
+        allowZoom: true,  // 允许用户缩放画板，默认值为true
+        "toolManager.mouseWheelBehavior": go.ToolManager.WheelZoom,  // 鼠标滚轮可以缩放画板
+        /*
+        * go.Diagram.DocumentScroll 默认值，视口控制画板滚动
+        * go.Diagram.InfiniteScroll 画板无限制滚动
+        */
+        scrollMode: go.Diagram.DocumentScroll
+    });
+
+    diagram.add(mk(go.Part, "Auto", {
+            selectable: false,
+            click: function (inputEvent, graphObject) {
+                inputEvent.diagram.scale += 0.5;
+            }
+        },
+        mk(go.Shape, {figure: "Rectangle", fill: "#CFCFCF", stroke: "#999999"}),
+        mk(go.TextBlock, {text: "放大", margin: 5})
+    ));
+    diagram.add(mk(go.Part, "Auto", {
+            selectable: false,
+            click: function (inputEvent, graphObject) {
+                inputEvent.diagram.scale -= 0.3;
+            }
+        },
+        mk(go.Shape, {figure: "Rectangle", fill: "#CFCFCF", stroke: "#999999"}),
+        mk(go.TextBlock, {text: "缩小", margin: 5})
+    ));
+
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Auto
+        },
+        mk(go.Shape, {width: 100, height: 60, fill: "#cb3c4f", stroke: "#cb3c4f"}, new go.Binding("figure")),
+        mk(go.TextBlock, {margin: 3}, new go.Binding("text"), new go.Binding("stroke", "color"))
+    );
+
+    diagram.model = mk(go.GraphLinksModel, {
+        nodeDataArray: [
+            {key: 1, figure: "Cylinder1", text: "Cylinder1", color: "#3a3ccb"},
+            {key: 2, figure: "Cylinder2", text: "Cylinder2", color: "#c157cb"},
+            {key: 2, figure: "Cylinder3", text: "Cylinder3", color: "#cb7d4b"},
+            {key: 2, figure: "Cylinder4", text: "Cylinder4", color: "#2acbad"},
+        ]
+    });
+</script>
+
+</body>
+</html>
