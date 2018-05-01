@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>go.TextBlock.choices</title>
+    <script>document.write("<header><h1>" + document.title + "</h1></header>");</script>
+    <script src="../../libs/1.8.17/go-debug.js"></script>
+    <script src="../../libs/goextension/TextEditorRadioButtons.js"></script>
+    <script src="../../libs/goextension/TextEditorSelectBox.js"></script>
+    <style>
+        #choices {width: 100%;height: 150px;}
+    </style>
+</head>
+<body>
+<section>
+    <h2>textblock.choices</h2>
+    <div>
+        <div id="choices"></div>
+    </div>
+</section>
+<script>
+    const mk = go.GraphObject.make;
+    const diagram = mk(go.Diagram, "choices", {
+        initialContentAlignment: go.Spot.Center
+    });
+    /*
+    * 设置choices有四个属性是必须设置的
+    * text 必须是提供的choices数组元素之一
+    * choices 必须是字符串数组
+    * editable 必须设置为true
+    * textEditor 必须引用对应扩展及设置扩展值
+    */
+    const node = mk(go.Node, "Vertical",
+        mk(go.TextBlock, {
+            text: "red", choices: ["red", "green", "blue"], editable: true,
+            textEditor: window.TextEditorRadioButtons,  // 单选按钮，依赖于TextEditorRadioButtons.js扩展
+            font: "30pt serif"
+        }),
+        mk(go.TextBlock, {
+            text: "apple", choices: ["apple", "banana", "orange"], editable: true,
+            textEditor: window.TextEditorSelectBox,  // 选择框，依赖于TextEditorSelectBox.js扩展
+            font: "30pt serif"
+        })
+    );
+    diagram.add(node);
+</script>
+</body>
+</html>
