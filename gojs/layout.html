@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Layout</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        #root {width: 100%;height: 300px;background: #0A6CD6;}
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<script>
+    var mk = go.GraphObject.make;
+    var layout = mk(go.GridLayout, {
+        wrappingColumn: NaN,
+        wrappingWidth: NaN,
+        spacing: new go.Size(10, 10),
+        /*
+        * Location part定位于网格点
+        */
+        alignment: go.GridLayout.Location
+    });
+    var diagram = mk(go.Diagram, "root", {
+        contentAlignment: go.Spot.TopLeft,
+        initialScale: 1,
+        "undoManager.isEnabled": true,
+        /*
+        * 设置画板布局，值不能是null
+        */
+        layout: layout
+    });
+
+    diagram.nodeTemplate = mk(go.Part, "Auto", {
+            selectable: false
+        },
+        mk(go.Shape, {figure: "RoundedRectangle", fill: "#cb7d4b", stroke: "#cb7d4b"}),
+        mk(go.TextBlock, {text: "default", stroke: "#ffffff", margin: new go.Margin(3, 10)}, new go.Binding("text"))
+    );
+
+    diagram.model = mk(go.Model, {
+        nodeDataArray: [
+            {key: 1, text: "copy"},
+            {key: 2, text: "past"},
+            {key: 3, text: "cut"}
+        ]
+    })
+</script>
+</body>
+</html>

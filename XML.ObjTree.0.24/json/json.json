@@ -1,0 +1,24 @@
+{
+  "scxml": {
+    "-xmlns": "https://www.w3.org/2005/07/scxml",
+    "-version": "1.0",
+    "-initial": "a",
+    "-name": "test",
+    "state": [
+      {
+        "-id": "a",
+        "transition": {
+          "-event": "key.a",
+          "-target": "b"
+        }
+      },
+      {
+        "-id": "b",
+        "transition": {
+          "-event": "key.b",
+          "-target": "a"
+        }
+      }
+    ]
+  }
+}

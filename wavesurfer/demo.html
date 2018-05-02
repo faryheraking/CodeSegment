@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="wavesurfer.js"></script>
+</head>
+<body>
+<div id="waveform1"></div>
+<div id="waveform2"></div>
+<script>
+    var wavesurfer1 = WaveSurfer.create({
+        container: '#waveform1',
+        waveColor: 'darkorange',
+        progressColor: 'purple',
+        splitChannels: false,
+        height: 25,
+        interact: true
+    });
+    var wavesurfer2 = WaveSurfer.create({
+        container: '#waveform2',
+        waveColor: 'darkorange',
+        progressColor: 'purple',
+        splitChannels: true,
+        height: 25,
+        interact: true
+    });
+    wavesurfer1.on("ready",function(){
+        console.log("ready has fire");
+    });
+    wavesurfer1.on("waveform-ready",function(){
+        console.log("waveform-ready has fire");
+    });
+    wavesurfer1.load("./13663786771p.mp3");
+    wavesurfer2.on("ready",function(){
+        console.log("ready has fire");
+    });
+    wavesurfer2.on("waveform-ready",function(){
+        console.log("waveform-ready has fire");
+    });
+    wavesurfer2.load("./13663786771p.mp3");
+</script>
+</body>
+</html>

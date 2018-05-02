@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>事件测试</title>
+    <script src="jquery-3.2.1.min.js"></script>
+</head>
+<body>
+
+<div id="has-event">绑定事件
+    <button>事件</button>
+</div>
+<script>
+    var time = 0, button;
+    $("#has-event").bind("click", function () {
+        time++;
+        button = button || $(this).children("button");
+        event = $._data(button[0], "events");
+        console.log("event", event);
+        hasEvent = event && event["click"];
+        console.log(hasEvent);
+        if (!hasEvent) {
+            button.bind("click", function () {
+                $(this).text("已绑定");
+            });
+        } else {
+            button.text("已绑定事件" + time);
+        }
+    });
+
+    function XX(x) {
+        switch (x) {
+            case 1 :
+                return 2;
+            case 2 :
+                return 3;
+        }
+    }
+
+    var v=XX(1);
+    console.log(v);
+
+
+</script>
+
+</body>
+</html>

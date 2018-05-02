@@ -1,0 +1,195 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<!--
+    version 必须是1.0
+    xmlns 必须
+    initial 初始化状态 a，如果不指定则默认为第一个子状态
+    name 状态机名称
+    datamodel 数据模型，null,ecmascript,xpath
+    binding 数据绑定时间，early,late
+-->
+<scxml version="1.0" xmlns="https://www.w3.org/2005/07/scxml" initial="a" name="stateName" datamodel="" binding="early">
+    <!--
+        state.a1 定义组合状态，必须指定initial属性，状态a1直接转向状态ab
+        如果不指定initial属性，则查找子元素initial，如果没有，则状态转向第一个子元素
+        initial属性和initial元素不能同时指定，但可以都不指定，规范要求指定
+    -->
+    <state id="a1" initial="ab">
+        <state id="ab">
+            <transition event="key.ab" target="b">
+                <log expr="history message"/>
+            </transition>
+        </state>
+        <parallel></parallel>
+        <onentry></onentry>
+        <onexit></onexit>
+        <!--
+            datamodel 定义所有或部分数据模型
+            一个组合状态state最多只能有一个datamodel定义
+        -->
+        <datamodel>
+            <!--
+                data定义数据项
+                id 标识数据项
+                expr/src 数据项的值
+            -->
+            <data id="name" expr="oldValue" src=""></data>
+            <!--
+                assign修改数据项值
+                location 目标数据项，与data的id值对应
+                expr 目标数据项新的值
+            -->
+            <assign location="name" expr="newValue"></assign>
+            <!--
+                validate验证数据项值的合法性
+            -->
+            <validate></validate>
+            <donedata>
+                <content></content>
+                <param/>
+            </donedata>
+            <send></send>
+        </datamodel>
+        <!--
+            invoke 调用外部服务
+        -->
+        <invoke></invoke>
+    </state>
+    <state id="a2">
+        <!--
+            复合状态的默认初始化状态，一个复合状态state最多只能包含一个
+            定义initial元素就不能在复合状态state上定义initial属性
+            复合状态state内的initial元素没有属性
+        -->
+        <initial>
+            <!--
+                target 唯一可指定属性，定义目标状态
+            -->
+            <transition target="a2p"></transition>
+        </initial>
+        <onentry></onentry>
+        <onexit></onexit>
+        <!--
+            parallel 并行状态
+            id 状态标识符
+            initial 复合并行状态指定，相当于子元素initial；原子并行状态不能指定，也不能包含initial元素
+        -->
+        <parallel id="a2p" initial="a2a">
+            <state id="a2a"></state>
+            <state id="a2b"></state>
+            <onentry></onentry>
+            <onexit></onexit>
+            <transition></transition>
+            <!--
+                parallel 定义子并行状态
+            -->
+            <parallel></parallel>
+            <final></final>
+            <history></history>
+            <!--
+                datamodel 定义并行状态数据模型，复合状态的parallel最多只能定义一个
+            -->
+            <datamodel></datamodel>
+            <invoke></invoke>
+        </parallel>
+        <!--
+            final 定义复合状态的最终状态
+        -->
+        <final></final>
+        <transition></transition>
+        <!--
+            history 伪状态，只能有一个transition子元素，且tranistion只能有一个target属性
+            id 状态标识符
+            type deep 记录原子状态；shallow 记录复合状态
+        -->
+        <history id="historystate" type="deep">
+            <transition target=""></transition>
+        </history>
+        <datamodel></datamodel>
+        <invoke></invoke>
+    </state>
+    <!--
+        state.b 定义原子状态
+    -->
+    <state id="b">
+        <!--
+            事件触发时，且满足 hasChild==true，状态转向 a
+            hasChild是函数
+        -->
+        <transition event="key.a" target="a" cond="hasChild()"></transition>
+        <!--
+            事件触发时，且满足 hasParent==true，状态转向 c
+            hasParent是变量
+        -->
+        <transition event="key.b" target="c" cond="hasParent"></transition>
+        <!--
+            事件触发时且满足 hasParent==false，状态转向d
+        -->
+        <transition event="key.b" target="d"></transition>
+    </state>
+    <state id="c">
+        <!--
+            onentry 进入状态时执行的事件
+        -->
+        <onentry>
+            <script>enterState('a')</script>
+        </onentry>
+        <!--
+            onexit 退出状态时执行的事件
+        -->
+        <onexit>
+            <script>exitState('a')</script>
+        </onexit>
+        <!--
+            事件触发时，状态转向 a
+            event 事件，规范：eventType.dataType
+            cond 条件，条件为true时转移状态
+            target 目标状态
+            type 目标状态是子孙状态时，是否源状态要退出再进入，external/internal
+        -->
+        <transition event="key.c" target="a" cond="ex" type="external"></transition>
+    </state>
+    <state id="d">
+        <!--
+            transition 中可包含可执行内容
+        -->
+        <transition event="key.d">
+            <if cond="isTrue()">
+                <script>TrueFun()</script>
+                <elseif cond="isFalse()"/>
+                <script>FalseFun()</script>
+                <else/>
+                <script>OtherFun()</script>
+                <log label="state.d" expr="complete"/>
+            </if>
+        </transition>
+    </state>
+    <!--
+        定义并行状态
+    -->
+    <parallel></parallel>
+    <!--
+        状态机终止状态，定义scxml状态机最终状态
+    -->
+    <final id="last">
+        <!--
+            onentry 无属性，只接受可执行内容
+        -->
+        <onentry></onentry>
+        <!--
+            onexit 无属性，只接受可执行内容
+        -->
+        <onexit></onexit>
+        <!--
+            ??数据包含在done.data.id事件或done.invoke.id事件内
+        -->
+        <donedata></donedata>
+    </final>
+    <!--
+        定义数据模型，scxml最多只能包含一个
+    -->
+    <datamodel></datamodel>
+    <!--
+        全局脚本，scxml最多只能包含一个
+    -->
+    <script></script>
+</scxml>

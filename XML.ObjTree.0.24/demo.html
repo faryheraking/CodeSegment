@@ -1,0 +1,189 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="lib/ObjTree.js"></script>
+</head>
+<body>
+<textarea name="" id="xml" style="width:100%;height:200px;padding:50px 0;"></textarea>
+<script>
+    // http://www.kawa.net/works/js/xml/objtree-e.html
+    var xmlDomOut = document.getElementById("xml");
+    var xmltree = new XML.ObjTree();
+    var tree = xmltree.parseHTTP("./xmlfile/scxml.xml");
+    xmlDomOut.value = tree;
+    var xml = '<scxml version="1.0" xmlns="https://www.w3.org/2005/07/scxml" initial="a" name="test">\
+                <state id="a">\
+                    <transition event="key.a" target="b"></transition>\
+                </state>\
+                <state id="b">\
+                    <transition event="key.b" target="a"></transition>\
+                </state>\
+                <parallel>\
+                    <state id="c">\
+                        <transition event="key.c" target="a"></transition>\
+                    </state>\
+                    <state id="d">\
+                        <transition event="key.d" target="b"></transition>\
+                    </state>\
+                </parallel>\
+                <parallel>\
+                    <state id="c">\
+                        <transition event="key.c" target="a"></transition>\
+                    </state>\
+                    <state id="d">\
+                        <transition event="key.d" target="b"></transition>\
+                    </state>\
+                </parallel>\
+        </scxml>';
+    var tree2 = xmltree.parseXML(xml);
+    xmlDomOut.value = JSON.stringify(tree2);
+    var json = {
+        "scxml": {
+            "-xmlns": "https://www.w3.org/2005/07/scxml",
+            "-version": "1.0",
+            "-initial": "a",
+            "-name": "test",
+            "state": [
+                {
+                    "-id": "a",
+                    "transition": {
+                        "-event": "key.a",
+                        "-target": "b"
+                    }
+                },
+                {
+                    "-id": "b",
+                    "transition": {
+                        "-event": "key.b",
+                        "-target": "a"
+                    }
+                }
+            ]
+        }
+    };
+    var xml2 = xmltree.writeXML(json);
+    xmlDomOut.value = xml2;
+
+    var text = {
+        "scxml": {
+            "-xmlns": "https://www.w3.org/2005/07/scxml",
+            "-version": "1.0",
+            "state": [
+                {"-id": 1, "transition": {"-event": "key.a", "-target": 2}},
+                {"-id": 2, "transition": {"-event": "key.a", "-target": 5}},
+                {"-id": 6, "transition": {"-event": "key.a", "-target": 1}},
+                {"-id": 2, "transition": {"-event": "key.a", "-target": 6}}
+            ],
+            "parallel": [{}]
+        }
+    };
+</script>
+<script>
+    /*go json to scxml json*/
+    var SCXMLJson = {
+        "scxml": {
+            "-xmlns": "https://www.w3.org/2005/07/scxml",
+            "-version": "1.0"
+        }
+    };
+    var nodeDataArray = [
+        {"key": 1, "text": "接听", "figure": "RoundedRectangle", "loc": "240 120"},
+        {"key": 2, "text": "确认身份", "source": "", "loc": "430 140"},
+        {"key": 5, "text": "处理", "loc": "630 50"},
+        {"key": 6, "text": "挂机", "figure": "RoundedRectangle", "loc": "630 160"}
+    ];
+    var linkDataArray = [
+        {"from": 1, "to": 2},
+        {"from": 2, "to": 5},
+        {"from": 6, "to": 1},
+        {"from": 2, "to": 6}
+    ];
+
+    var goDataArray = [];
+
+    for (var node = 0, nodeLen = nodeDataArray.length; node < nodeLen; node++) {
+        var nodeObj = nodeDataArray[node], nodeKey = nodeObj.key;
+        for (var link = 0, linkLen = linkDataArray.length; link < linkLen; link++) {
+            var linkObj = linkDataArray[link], linkFrom = linkObj.from;
+            if (linkFrom == nodeKey) {
+                if (nodeObj.to) {
+                    nodeObj.to.push(linkObj.to);
+                } else {
+                    nodeObj.to = [linkObj.to];
+                }
+            }
+        }
+        goDataArray.push(nodeObj);
+    }
+
+    console.dir(goDataArray);
+
+
+
+
+
+
+    /*
+    var scxml = SCXMLJson["scxml"];
+    var scxmlkey = [];
+    linkDataArray.forEach(function (o, i) {
+        var nodeKey = o.from;
+        var nodeTarget = o.to;
+        var obj, parallelObj, parallelStateIndex, prevSameIndex;
+        if (scxml["state"]) {
+            scxmlkey.forEach(function (key) {
+                if (key && key[nodeKey] == nodeKey) {
+                    prevSameIndex = key["index"];
+                    if (!scxml["parallel"]) {
+                        scxml["parallel"] = [];
+                    }
+                    scxml["parallel"].push({});
+                    parallelObj = scxml["parallel"][scxml["parallel"].length - 1];
+                } else {
+                    scxml["state"][i] = {};
+                }
+            });
+        } else {
+            scxml["state"] = [];
+            scxml["state"][i] = {};
+        }
+        obj = scxml["state"][i];
+        scxmlkey[i] = {};
+        scxmlkey[i][nodeKey] = nodeKey;
+        scxmlkey[i]["index"] = i;
+        nodeDataArray.forEach(function (d, j) {
+            if (d.key == nodeKey) {
+                if (!obj) {
+                    parallelStateIndex = i;
+                    if (!parallelObj["state"]) {
+                        parallelObj["state"] = [];
+                    }
+                    parallelObj["state"][parallelStateIndex - i + 1] = {};
+                    parallelObj["state"][parallelStateIndex - i] = scxml["state"][prevSameIndex];
+                    scxml["state"].splice(prevSameIndex, 1);
+                    obj = parallelObj["state"][parallelStateIndex - i + 1];
+                }
+                obj["-id"] = nodeKey;
+                obj["transition"] = {
+                    "-event": "key.a",
+                    "-target": nodeTarget
+                };
+            }
+        });
+    });
+    console.log(JSON.stringify(SCXMLJson));
+    var xml3 = xmltree.writeXML(SCXMLJson);
+    xmlDomOut.value = xml3;
+    */
+</script>
+<script>
+
+
+</script>
+</body>
+</html>
