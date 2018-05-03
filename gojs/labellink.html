@@ -36,7 +36,42 @@
         }),
         mk(go.Shape),
         mk(go.Shape, {toArrow: "standard"}),
-        mk(go.TextBlock, new go.Binding("text"))
+        mk(go.TextBlock, {
+                /*
+                * @property segmentFraction 百分比位置 0~1
+                * 0 线段开始处，1 线段结束处
+                */
+                segmentFraction: 0.3
+            },
+            new go.Binding("text"),
+            /*
+            * @property segmentIndex 线段位置
+            * 直线链接只能为 0
+            * 折线链接从1开始计，每一段加1，依次为 1,2,3,..
+            * 曲线链接从1开始，每个弧都加1
+            */
+            new go.Binding("segmentIndex", "type", function (type) {
+                switch (type) {
+                    case "curve":
+                    case "line":
+                        return 0;
+                    case "orthogonal":
+                        return 1;
+                }
+            })
+        ),
+        mk(go.TextBlock, {segmentFraction: 0.6},
+            new go.Binding("text", "text2"),
+            new go.Binding("segmentIndex", "type", function (type) {
+                switch (type) {
+                    case "curve":
+                    case "line":
+                        return 0;
+                    case "orthogonal":
+                        return 3;
+                }
+            })
+        )
     );
     diagram.model = mk(go.GraphLinksModel, {
         nodeDataArray: [
@@ -45,10 +80,17 @@
             {key: 2, text: "结束"}
         ],
         linkDataArray: [
-            {from: "1", to: "2", text: "链接文本", routing: "normal", curve: "bezier"},
-            {from: "1", to: "3", text: "链接文本", routing: "orthogonal", curve: "none"},
-            {from: "2", to: "3", text: "链接文本", routing: "normal", curve: "none"}
-
+            {from: "1", to: "2", text: "链接文本", text2: "链接文本2", routing: "normal", curve: "bezier", type: "curve"},
+            {
+                from: "1",
+                to: "3",
+                text: "链接文本",
+                text2: "链接文本2",
+                routing: "orthogonal",
+                curve: "none",
+                type: "orthogonal"
+            },
+            {from: "2", to: "3", text: "链接文本", text2: "链接文本2", routing: "normal", curve: "none", type: "line"}
         ]
     })
 </script>

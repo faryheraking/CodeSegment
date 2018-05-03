@@ -8,11 +8,11 @@
     <title>Port</title>
     <script src="libs/go-debug-p.js"></script>
     <style>
-        #root {width: 100%;height: 300px;background: #00B45F;}
+        #root, #port {width: 100%;height: 300px;background: #00B45F;}
     </style>
 </head>
 <body>
-<div id="root"></div>
+<div id="root" style="display:none;"></div>
 <script>
     var mk = go.GraphObject.make;
     var diagram = mk(go.Diagram, "root", {
@@ -24,8 +24,11 @@
         layout: mk(go.LayeredDigraphLayout, {columnSpacing: 10})
     });
     /*
-    * portId、fromPort、toPort、fromLinkable、toLinkable、toMaxLinks
-    * 可以应用到go.Node、go.Shape
+    * portId 设置节点port标识符，必须唯一且可视后不能修改，作为linkFromPortIdProperty、linkToPortIdProperty属性定义的linkDataArray的属性值
+    * fromSpot 设置为非go.Spot.None、go.Spot.Default的值，表示允许链接从节点引出
+    * toSpot 设置为非go.Spot.None、go.Spot.Default的值，表示允许链接引入到节点
+    * fromLinkable、toLinkable、toMaxLinks
+    * 可以应用到go.Node、go.Shape、go.Group
     */
     diagram.nodeTemplate = mk(go.Node, {type: go.Panel.Auto},
         mk(go.Shape, {figure: "Rectangle", fill: "#cb3c4f"}),
@@ -47,10 +50,10 @@
                 }),
                 mk(go.TextBlock, "A")
             ),
-            mk(go.Panel, "Horizontal",
+            mk(go.Panel, "Auto",
                 {column: 0, row: 2},
                 mk(go.Shape, {
-                    width: 6, height: 6,
+                    width: 30, height: 30, stroke: "red", fill: "transparent",
                     portId: "B", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
                 }),
                 mk(go.TextBlock, "B")
@@ -72,15 +75,145 @@
         mk(go.Shape, {fromArrow: "Chevron"}),
         mk(go.Shape, {toArrow: "Standard"})
     );
-    diagram.model = mk(go.GraphLinksModel, {
+    var glm = mk(go.GraphLinksModel, {
+        /*
+        * linkFromPortIdProperty 定义链接源自的数据属性
+        * linkToPortIdProperty 定义链接去向的数据属性
+        * linkKeyProperty 定义链接数据标识符属性，只有定义了此属性才能使用 findLinkDataForKey()
+        */
         linkFromPortIdProperty: "fromPort",
         linkToPortIdProperty: "toPort",
+        linkKeyProperty: "id",
         nodeDataArray: [
-            {key: "A", text: "AB"},
-            {key: "B", text: "BC"}
+            {key: 1, text: "第一组"},
+            {key: 2, text: "第二组"},
+            {key: 3, text: "第三组"}
         ],
-        linkDataArray: []
+        linkDataArray: [
+            {id: 1, toPort: "A"},
+            {id: 2, from: 1, to: 2, fromPort: "Out"}
+        ]
     });
+    diagram.model = glm;
+    /*
+    * findLinkDataForKey(key) 根据 linkKeyProperty定义的数据key属性查找对应的链接数据
+    */
+    var linkData = glm.findLinkDataForKey(1);
+    console.log(linkData.toPort);
+    /*
+    * findLindForData(data) 根据链接数据返回对应的链接对象
+    */
+    var link = diagram.findLinkForData(linkData);
+    console.log(link);
+    /*
+    * findNodeForKey(key) 根据nodeDataArray中key查找对应的节点或组
+    */
+    var node = diagram.findNodeForKey(2);
+    console.log(node);
+    /*
+    * addLinkData(data) 向linkDataArray添加新的数据对象
+    * removeLinkData(data) 从linkDataArray中移除数据对象 ？？测试未通过
+    */
+    glm.addLinkData({id: 3, from: 1, to: 3, formPort: "Out"});
+    glm.removeLinkData(linkData);
+</script>
+<div id="port"></div>
+<script>
+    function simplePort() {
+        /*
+        * 简单的port
+        */
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "port", {
+            initialContentAlignment: go.Spot.Center
+        });
+        var node = mk(go.Node, "Vertical", {
+                fromSpot: go.Spot.Right,
+                toSpot: go.Spot.Left
+            },
+            new go.Binding("portId"),
+            mk(go.Shape, {width: 30, height: 30, fill: "transparent"}, new go.Binding("stroke")),
+            mk(go.TextBlock, {font: "16px sans-serif", stroke: "#00FF00"}, new go.Binding("text"))
+        );
+        var model = mk(go.GraphLinksModel, {
+            nodeDataArray: [
+                {key: 1, text: "第一", portId: "node1", stroke: "#ff1d11"},
+                {key: 2, text: "第二", portId: "node2", stroke: "#3a3ccb"}
+            ],
+            linkDataArray: [
+                {from: 1, to: 2}
+            ]
+        });
+        diagram.nodeTemplate = node;
+        diagram.model = model;
+
+    }
+
+    //simplePort();
+</script>
+<script>
+    /*
+    * 指定部分作为链接点
+    */
+    function shapePort() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "port", {
+            initialContentAlignment: go.Spot.Center
+        });
+        diagram.nodeTemplate = mk(go.Node, "Vertical",
+            mk(go.Shape, {
+                /*
+                * 将元素 portId="" ，表示元素作为默认的节点port
+                */
+                portId: "",
+                fromSpot: go.Spot.Right, toSpot: go.Spot.Left,
+                width: 100, height: 50
+            }, new go.Binding("fill"), new go.Binding("portId")),
+            mk(go.TextBlock, {font: "16px sans-serif"}, new go.Binding("stroke", "fill"), new go.Binding("text"))
+        );
+        var glm = mk(go.GraphLinksModel, {
+            /*
+            * 只要有元素的 portId 为非空字符串，就要设置
+            * linkFromPortIdProperty 和 linkToPortIdProperty
+            */
+            linkFromPortIdProperty: "fromport",
+            linkToPortIdProperty: "toport",
+            linkKeyProperty: "id",  // linkDataArray每条数据的key
+            nodeDataArray: [
+                {key: 1, text: "第一", fill: "#ff1d11", portId: "n1"},
+                {key: 2, text: "第二", fill: "#3a3ccb", portId: "n2"}
+            ],
+            linkDataArray: [
+                /*
+                * 即使使用port来代替key实现链接
+                * 也需要设置form,to
+                */
+                {id: "L1", from: 1, to: 2, fromport: "n1", toport: "n2"}
+            ]
+        });
+        diagram.model = glm;
+        /*
+        * [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回链接数据中链接源key的值
+        * [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回链接数据中链接目标key的值
+        */
+        var toKey = glm.getToKeyForLinkData({from: 1, to: 2, id: "L1"});
+        var fromKey = glm.getFromKeyForLinkData({from: 1, to: 2, id: "L1"});
+        console.log("toKey=", toKey, "fromKey=", fromKey);
+        /*
+        * [go.GraphLinksModel].getKeyForLinkData(link_data) 返回链接数据中linkKeyProperty指定的链接key的值
+        */
+        var key = glm.getKeyForLinkData({form: 1, to: 2, id: "L1"});
+        console.log("key=", key);
+        /*
+        * [go.GraphLinksModel].getFromPortIdForLinkData(link_data) 返回链接数据中链接源portId的值
+        * [go.GraphLinksModel].getToPortIdForLinkData(link_data) 返回链接数据中链接目标portId的值
+        */
+        var fromPortId = glm.getFromPortIdForLinkData({id: "L1", from: 1, to: 2, fromport: "n1", toport: "n2"});
+        var toPortId = glm.getToPortIdForLinkData({id: "L1", from: 1, to: 2, fromport: "n1", toport: "n2"});
+        console.log("fromPortId=", fromPortId, "toPortId=", toPortId);
+    }
+
+    shapePort();
 </script>
 </body>
 </html>
