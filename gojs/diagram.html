@@ -15,10 +15,19 @@
     var dg = mk(go.Diagram, "root", {
         contentAlignment: go.Spot.Center,
         /*
-        * go.Diagram.DocumentScroll 滚动到文档边缘，默认值
-        * go.Diagram.InfiniteScroll 无限滚动
+        * [go.Diagram].DocumentScroll 滚动到文档边缘，默认值
+        * [go.Diagram].InfiniteScroll 无限滚动
         */
-        scrollMode: go.Diagram.DocumentScroll
+        scrollMode: go.Diagram.DocumentScroll,
+        /*
+        * [go.Diagram].isReadOnly 画板是否只读，只读状态下画板不可编辑
+        */
+        isReadOnly: true,
+        /*
+        * [go.Diagram].isEnabled 是否允许用户与画板交互
+        * true 允许交互，false 禁止交互
+        */
+        isEnabled:false
     });
     dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
         mk(go.Panel, {type: go.Panel.Auto},
@@ -37,6 +46,10 @@
             {text: "y"}
         ]
     });
+    /*
+    * [go.Model].isReadOnly 设置数据模型是否可修改
+    */
+    dg.model.isReadOnly=false;
 
     dg.groupTemplate = mk(go.Group, "Auto", {
             /*
