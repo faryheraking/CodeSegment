@@ -8,123 +8,126 @@
     <title>Port</title>
     <script src="libs/go-debug-p.js"></script>
     <style>
-        #root, #port {width: 100%;height: 300px;background: #00B45F;}
+        #root, #port {width: 100%;height: 300px;}
     </style>
 </head>
 <body>
-<div id="root" style="display:none;"></div>
+<div id="root"></div>
 <script>
-    var mk = go.GraphObject.make;
-    var diagram = mk(go.Diagram, "root", {
-        contentAlignment: go.Spot.Center,
-        "toolManager.hoverDelay": 300,
-        "toolManager.toolTipDuration": 1000,
-        "undoManager.isEnabled": true,
-        allowDrop: true,
-        layout: mk(go.LayeredDigraphLayout, {columnSpacing: 10})
-    });
-    /*
-    * portId 设置节点port标识符，必须唯一且可视后不能修改，作为linkFromPortIdProperty、linkToPortIdProperty属性定义的linkDataArray的属性值
-    * fromSpot 设置为非go.Spot.None、go.Spot.Default的值，表示允许链接从节点引出
-    * toSpot 设置为非go.Spot.None、go.Spot.Default的值，表示允许链接引入到节点
-    * fromLinkable、toLinkable、toMaxLinks
-    * 可以应用到go.Node、go.Shape、go.Group
-    */
-    diagram.nodeTemplate = mk(go.Node, {type: go.Panel.Auto},
-        mk(go.Shape, {figure: "Rectangle", fill: "#cb3c4f"}),
-        mk(go.Panel, "Table",
-            mk(go.RowColumnDefinition, {column: 0, alignment: go.Spot.Left}),
-            mk(go.RowColumnDefinition, {column: 2, alignment: go.Spot.Right}),
-            mk(go.TextBlock, {
-                stroke: "#CCC000",
-                column: 0, row: 0,
-                columnSpan: 3,
-                alignment: go.Spot.Center,
-                margin: new go.Margin(4, 2)
-            }, new go.Binding("text")),
-            mk(go.Panel, "Horizontal",
-                {column: 0, row: 1},
-                mk(go.Shape, {
-                    width: 6, height: 6,
-                    portId: "A", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
-                }),
-                mk(go.TextBlock, "A")
-            ),
-            mk(go.Panel, "Auto",
-                {column: 0, row: 2},
-                mk(go.Shape, {
-                    width: 30, height: 30, stroke: "red", fill: "transparent",
-                    portId: "B", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
-                }),
-                mk(go.TextBlock, "B")
-            ),
-            mk(go.Panel, "Horizontal",
-                {column: 2, row: 1, rowSpan: 2},
-                mk(go.TextBlock, "Out"),
-                mk(go.Shape, {
-                    width: 6, height: 6,
-                    portId: "Out", fromSpot: go.Spot.Right, fromLinkable: true
-                })
-            )
-        )
-    );
-    diagram.linkTemplate = mk(go.Link, {
-            routing: go.Link.Orthogonal, corner: 3
-        },
-        mk(go.Shape),
-        mk(go.Shape, {fromArrow: "Chevron"}),
-        mk(go.Shape, {toArrow: "Standard"})
-    );
-    var glm = mk(go.GraphLinksModel, {
+    function mainTest() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "root", {
+            contentAlignment: go.Spot.Center,
+            "toolManager.hoverDelay": 300,
+            "toolManager.toolTipDuration": 1000,
+            "undoManager.isEnabled": true,
+            allowDrop: true,
+            layout: mk(go.LayeredDigraphLayout, {columnSpacing: 10})
+        });
         /*
-        * linkFromPortIdProperty 定义链接源自的数据属性
-        * linkToPortIdProperty 定义链接去向的数据属性
-        * linkKeyProperty 定义链接数据标识符属性，只有定义了此属性才能使用 findLinkDataForKey()
+        * portId 设置节点port标识符，必须唯一且可视后不能修改，作为linkFromPortIdProperty、linkToPortIdProperty属性定义的linkDataArray的属性值
+        * fromSpot 设置为非go.Spot.None、go.Spot.Default的值，表示允许链接从节点引出
+        * toSpot 设置为非go.Spot.None、go.Spot.Default的值，表示允许链接引入到节点
+        * fromLinkable、toLinkable、toMaxLinks
+        * 可以应用到go.Node、go.Shape、go.Group
         */
-        linkFromPortIdProperty: "fromPort",
-        linkToPortIdProperty: "toPort",
-        linkKeyProperty: "id",
-        nodeDataArray: [
-            {key: 1, text: "第一组"},
-            {key: 2, text: "第二组"},
-            {key: 3, text: "第三组"}
-        ],
-        linkDataArray: [
-            {id: 1, toPort: "A"},
-            {id: 2, from: 1, to: 2, fromPort: "Out"}
-        ]
-    });
-    diagram.model = glm;
-    /*
-    * findLinkDataForKey(key) 根据 linkKeyProperty定义的数据key属性查找对应的链接数据
-    */
-    var linkData = glm.findLinkDataForKey(1);
-    console.log(linkData.toPort);
-    /*
-    * findLindForData(data) 根据链接数据返回对应的链接对象
-    */
-    var link = diagram.findLinkForData(linkData);
-    console.log(link);
-    /*
-    * findNodeForKey(key) 根据nodeDataArray中key查找对应的节点或组
-    */
-    var node = diagram.findNodeForKey(2);
-    console.log(node);
-    /*
-    * addLinkData(data) 向linkDataArray添加新的数据对象
-    * removeLinkData(data) 从linkDataArray中移除数据对象 ？？测试未通过
-    */
-    glm.addLinkData({id: 3, from: 1, to: 3, formPort: "Out"});
-    glm.removeLinkData(linkData);
+        diagram.nodeTemplate = mk(go.Node, {type: go.Panel.Auto},
+            mk(go.Shape, {figure: "Rectangle", fill: "#cb3c4f"}),
+            mk(go.Panel, "Table",
+                mk(go.RowColumnDefinition, {column: 0, alignment: go.Spot.Left}),
+                mk(go.RowColumnDefinition, {column: 2, alignment: go.Spot.Right}),
+                mk(go.TextBlock, {
+                    stroke: "#CCC000",
+                    column: 0, row: 0,
+                    columnSpan: 3,
+                    alignment: go.Spot.Center,
+                    margin: new go.Margin(4, 2)
+                }, new go.Binding("text")),
+                mk(go.Panel, "Horizontal",
+                    {column: 0, row: 1},
+                    mk(go.Shape, {
+                        width: 6, height: 6,
+                        portId: "A", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
+                    }),
+                    mk(go.TextBlock, "A")
+                ),
+                mk(go.Panel, "Auto",
+                    {column: 0, row: 2},
+                    mk(go.Shape, {
+                        width: 30, height: 30, stroke: "red", fill: "transparent",
+                        portId: "B", toSpot: go.Spot.Left, toLinkable: true, toMaxLinks: 1
+                    }),
+                    mk(go.TextBlock, "B")
+                ),
+                mk(go.Panel, "Horizontal",
+                    {column: 2, row: 1, rowSpan: 2},
+                    mk(go.TextBlock, "Out"),
+                    mk(go.Shape, {
+                        width: 6, height: 6,
+                        portId: "Out", fromSpot: go.Spot.Right, fromLinkable: true
+                    })
+                )
+            )
+        );
+        diagram.linkTemplate = mk(go.Link, {
+                routing: go.Link.Orthogonal, corner: 3
+            },
+            mk(go.Shape),
+            mk(go.Shape, {fromArrow: "Chevron"}),
+            mk(go.Shape, {toArrow: "Standard"})
+        );
+        var glm = mk(go.GraphLinksModel, {
+            /*
+            * linkFromPortIdProperty 定义链接源自的数据属性
+            * linkToPortIdProperty 定义链接去向的数据属性
+            * linkKeyProperty 定义链接数据标识符属性，只有定义了此属性才能使用 findLinkDataForKey()
+            */
+            linkFromPortIdProperty: "fromPort",
+            linkToPortIdProperty: "toPort",
+            linkKeyProperty: "id",
+            nodeDataArray: [
+                {key: 1, text: "第一组"},
+                {key: 2, text: "第二组"},
+                {key: 3, text: "第三组"}
+            ],
+            linkDataArray: [
+                {id: 1, toPort: "A"},
+                {id: 2, from: 1, to: 2, fromPort: "Out"}
+            ]
+        });
+        diagram.model = glm;
+        /*
+        * findLinkDataForKey(key) 根据 linkKeyProperty定义的数据key属性查找对应的链接数据
+        */
+        var linkData = glm.findLinkDataForKey(1);
+        console.log(linkData.toPort);
+        /*
+        * findLindForData(data) 根据链接数据返回对应的链接对象
+        */
+        var link = diagram.findLinkForData(linkData);
+        console.log(link);
+        /*
+        * findNodeForKey(key) 根据nodeDataArray中key查找对应的节点或组
+        */
+        var node = diagram.findNodeForKey(2);
+        console.log(node);
+        /*
+        * addLinkData(data) 向linkDataArray添加新的数据对象
+        * removeLinkData(data) 从linkDataArray中移除数据对象 ？？测试未通过
+        */
+        glm.addLinkData({id: 3, from: 1, to: 3, formPort: "Out"});
+        glm.removeLinkData(linkData);
+    }
+
+    //mainTest();
 </script>
-<div id="port"></div>
 <script>
     function simplePort() {
         /*
         * 简单的port
         */
         var mk = go.GraphObject.make;
-        var diagram = mk(go.Diagram, "port", {
+        var diagram = mk(go.Diagram, "root", {
             initialContentAlignment: go.Spot.Center
         });
         var node = mk(go.Node, "Vertical", {
@@ -157,7 +160,7 @@
     */
     function shapePort() {
         var mk = go.GraphObject.make;
-        var diagram = mk(go.Diagram, "port", {
+        var diagram = mk(go.Diagram, "root", {
             initialContentAlignment: go.Spot.Center
         });
         diagram.nodeTemplate = mk(go.Node, "Vertical",
@@ -165,7 +168,7 @@
                 /*
                 * 将元素 portId="" ，表示元素作为默认的节点port
                 */
-                portId: "",
+                //portId: "",
                 fromSpot: go.Spot.Right, toSpot: go.Spot.Left,
                 width: 100, height: 50
             }, new go.Binding("fill"), new go.Binding("portId")),
@@ -213,7 +216,224 @@
         console.log("fromPortId=", fromPortId, "toPortId=", toPortId);
     }
 
-    shapePort();
+    //shapePort();
+</script>
+<script>
+    /*
+    * 一个节点port多个链接
+    */
+    function onePortMultiLinks() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "root", {
+            initialContentAlignment: go.Spot.Center
+        });
+        diagram.nodeTemplate = mk(go.Node, "Auto",
+            mk(go.Shape, {
+                width: 180, height: 60, fill: "#FFFFFF", stroke: "#CCCCCC", cursor: "pointer",
+                /*
+                * 有 fromLinkableDuplicates、toLinkableDuplicates 必须设置 portId=""，否则无法添加链接
+                * 设置这两个属性也必须设置fromLinkable=true和toLinkable=true
+                */
+                portId: "",
+                fromLinkable: true, toLinkable: true,
+                fromLinkableDuplicates: true, toLinkableDuplicates: true,
+                /*
+                * [go.GraphObject].fromLinkableSelfNode 允许链接源为自身
+                * [go.GraphObject].toLinkableSelfNode 允许链接目标为自身
+                * 这两个属性只能设置到Node节点或portId为非null的元素
+                * 设置这两个属性也必须设置fromLinkable=true和toLinkable=true
+                */
+                fromLinkableSelfNode: true, toLinkableSelfNode: true
+            }),
+            mk(go.TextBlock, new go.Binding("text"))
+        );
+        diagram.model = new go.GraphLinksModel([
+            {key: 1, text: "开始"},
+            {key: 2, text: "菜单"},
+            {key: 3, text: "挂机"},
+            {key: 4, text: "通话"}
+        ], [
+            /*{from: 1, to: 2}*/
+        ]);
+        // 默认链接
+        diagram.validCycle = go.Diagram.CycleAll;
+        // 无向链接
+        //diagram.validCycle = go.Diagram.CycleNotDirected;
+        // 有向链接
+        //diagram.validCycle = go.Diagram.CycleNotUndirected;
+        // 节点只允许一个from链接，允许多个to链接
+        //diagram.validCycle = go.Diagram.CycleSourceTree;
+        // 节点允许多个from链接，只允许一个to链接
+        //diagram.validCycle = go.Diagram.CycleDestinationTree;
+    }
+
+    //onePortMultiLinks();
+</script>
+<script>
+    /*
+    * 链接验证
+    */
+    function linkValidation() {
+        var $ = go.GraphObject.make;
+        var diagram = $(go.Diagram, "root", {
+            initialContentAlignment: go.Spot.Center
+        });
+        diagram.nodeTemplate = $(go.Node, "Auto",
+            $(go.Shape, "Ellipse",
+                {
+                    cursor: "pointer", portId: "",
+                    fromLinkable: true, toLinkable: true
+                },
+                new go.Binding("fill", "color")),
+            $(go.TextBlock,
+                {stroke: "white", margin: 3},
+                new go.Binding("text", "key"))
+        );
+
+        diagram.linkTemplate = $(go.Link,
+            {curve: go.Link.Bezier, relinkableFrom: true, relinkableTo: true},
+            $(go.Shape, {strokeWidth: 2},
+                new go.Binding("stroke", "fromNode", function (n) {
+                    return n.data.color;
+                })
+                    .ofObject()),
+            $(go.Shape, {toArrow: "Standard", stroke: null},
+                new go.Binding("fill", "fromNode", function (n) {
+                    return n.data.color;
+                })
+                    .ofObject())
+        );
+
+        /*
+        * fromnode、tonode --> Node
+        * fromport、toport --> GraphObject
+        */
+        function sameColor(fromnode, fromport, tonode, toport) {
+            console.log(fromnode instanceof go.Node);
+            console.log(fromport instanceof go.GraphObject);
+            /*
+            * [go.Diagram].selection 返回选择节点的Set，不能修改
+            */
+            console.log(diagram.selection.toArray().toString());
+            /*
+            * [go.Node].data 返回节点绑定的数据对象
+            */
+            return fromnode.data.color === tonode.data.color;
+        }
+
+        // 相同颜色的节点可以链接
+        diagram.toolManager.linkingTool.linkValidation = sameColor;
+        diagram.toolManager.relinkingTool.linkValidation = sameColor;
+
+        var nodeDataArray = [
+            {key: "Red1", color: "red"},
+            {key: "Blue1", color: "blue"},
+            {key: "Green1", color: "green"},
+            {key: "Green2", color: "green"},
+            {key: "Red2", color: "red"},
+            {key: "Blue2", color: "blue"},
+            {key: "Red3", color: "red"},
+            {key: "Green3", color: "green"},
+            {key: "Blue3", color: "blue"}
+        ];
+        var linkDataArray = [];
+        diagram.model = new go.GraphLinksModel(nodeDataArray, linkDataArray);
+    }
+
+    //linkValidation();
+</script>
+<script>
+    /*
+    * 一个节点带多个port
+    */
+    function oneNodeMorePort() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "root", {
+            initialContentAlignment: go.Spot.Center
+        });
+        var node = mk(go.Node, "Vertical", {padding: 10},
+            mk(go.Panel, "Auto",
+                mk(go.Shape, {
+                        width: 180, height: 60, fill: "#FFFFFF", stroke: "red", cursor: "pointer",
+                        /*
+                        * [go.GraphObject].fromLinkable
+                        * [go.GraphObject].toLinkable
+                        * 允许用户在元素上交互式操作链接
+                        */
+                        fromLinkable: false, toLinkable: true, toSpot: go.Spot.Left, toMaxLinks: 1
+                    },
+                    new go.Binding("portId")
+                ),
+                /*
+                * 只要节点设置有fromLinkable=true,toLinkable=true
+                * 必须在节点内添加不可链接的元素，以便于选择和拖动元素
+                */
+                mk(go.Shape, {
+                    width: 180,
+                    height: 60,
+                    fill: "transparent",
+                    stroke: null,
+                    fromLinkable: false,
+                    toLinkable: false
+                }),
+                mk(go.TextBlock, "菜单", {alignment: go.Spot.Center})
+            ),
+            mk(go.Panel, "Horizontal", {
+                    itemTemplate: mk(go.Panel, "Auto", {},
+                        mk(go.Shape, {
+                            width: 30, height: 30, fill: "transparent", stroke: "black", cursor: "pointer",
+                            /*
+                            * [go.GraphObject].fromMaxLinks 最大链接源数
+                            */
+                            fromSpot: go.Spot.Bottom, fromLinkable: true, toLinkable: false, fromMaxLinks: 1
+                        }, new go.Binding("portId"), new go.Binding("stroke")),
+                        mk(go.TextBlock, "1", new go.Binding("text")),
+                    )
+                },
+                new go.Binding("itemArray", "panelText")
+            )
+        );
+        var link = mk(go.Link, {
+                routing: go.Link.Orthogonal,
+                curve: go.Link.None,
+            },
+            mk(go.Shape),
+            mk(go.Shape, {toArrow: "OpenTriangle"})
+        );
+
+        var glm = mk(go.GraphLinksModel, {
+            linkFromPortIdProperty: "fromPort",
+            linkToPortIdProperty: "toPort",
+            nodeDataArray: [
+                {
+                    key: 1,
+                    panelText: [
+                        {text: "1", portId: "11", stroke: "green"},
+                        {text: "2", portId: "12", stroke: "green"},
+                        {text: "3", portId: "13", stroke: "green"},
+                        {text: "4", portId: "14", stroke: "green"}
+                    ],
+                    portId: "1"
+                },
+                {
+                    key: 2, panelText: [
+                        {text: "1", portId: "21", stroke: "green"},
+                        {text: "2", portId: "22", stroke: "green"}
+                    ],
+                    portId: "2"
+                }
+            ],
+            linkDataArray: [
+                // {from: 1, to: 2, fromPort: "1", toPort: "linkto"}
+            ]
+        });
+        diagram.nodeTemplate = node;
+        diagram.linkTemplate = link;
+        diagram.model = glm;
+
+    }
+
+    oneNodeMorePort();
 </script>
 </body>
 </html>

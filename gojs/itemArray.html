@@ -18,59 +18,58 @@
         commandHandler: new go.CommandHandler(),
         /*右击时触发*/
         contextClick: function () {
-            console.log("context-click");
+            //console.log("context-click");
         },
         /*仅在点击画板时执行一次*/
         click: function (inputEvent) {
-            console.log("click", inputEvent);
+            //console.log("click", inputEvent);
         }
     });
     diagram.addDiagramListener("BackgroundSingleClicked", function (inputEvent) {
-        console.log("BackgroundSingleClicked", inputEvent);
+        //console.log("BackgroundSingleClicked", inputEvent);
     });
-    diagram.nodeTemplate = mk(go.Node, {type: go.Panel.Vertical},
-        new go.Binding("itemArray", "items"), {
-            itemTemplate: mk(go.Panel, {type: go.Panel.Auto},
-                mk(go.Shape, {figure: "Rectangle", fill: "#990099"}),
+    /*
+    * [go.Node][go.Part][go.Panel] 均有 itemArray
+    * [go.Node][go.Part][go.Panel] 均有 itemTemplate
+    * 一个节点可以有多个 itemArray
+    *
+    * [go.Diagram].nodeTemplate 值必须是 [go.Node][go.Part] 实例
+    */
+    diagram.nodeTemplate = mk(go.Node, {
+            type: go.Panel.Horizontal,
+            padding: 10
+        },
+        mk(go.Panel, "Vertical", {
                 /*
-                * new go.Binding("text", "") 是必须的，且不能是其它值
+                * [go.Panel].itemTemplate 值必须是[go.Panel]实例，而不能是[go.Part]
                 */
-                mk(go.TextBlock, {margin: 5, stroke: "#ffffff"}, new go.Binding("text", ""))
-            )
-        }
+                itemTemplate: mk(go.Panel, "Auto",
+                    mk(go.Shape, {
+                            width: 50, height: 50, stroke: "blue", fill: null,
+                            fromLinkable: true, toLinkable: true, cursor: "pointer",
+                            fromSpot: go.Spot.Right, toSpot: go.Spot.Left,
+                            portId:"xx"
+                        }
+                    ),
+                    mk(go.TextBlock, new go.Binding("text", ""))
+                )
+            },
+            new go.Binding("itemArray", "actions")
+        ),
+        mk(go.Panel, "Vertical", {
+                itemTemplate: mk(go.Panel, "Auto",
+                    mk(go.Shape, {width: 50, height: 50, stroke: "blue", fill: null}),
+                    mk(go.TextBlock, new go.Binding("text", ""))
+                )
+            }, new go.Binding("itemArray", "items")
+        )
     );
-    diagram.contextMenu =
-        mk(go.Adornment, "Vertical",
-            mk("ContextMenuButton",
-                mk(go.TextBlock, "Undo"),
-                {
-                    click: function (e, obj) {
-                        e.diagram.commandHandler.undo();
-                    }
-                },
-                new go.Binding("visible", "", function (o) {
-                    return o.diagram.commandHandler.canUndo();
-                }).ofObject()),
-            mk("ContextMenuButton",
-                mk(go.TextBlock, "Redo"),
-                {
-                    click: function (e, obj) {
-                        e.diagram.commandHandler.redo();
-                    }
-                },
-                new go.Binding("visible", "", function (o) {
-                    return o.diagram.commandHandler.canRedo();
-                }).ofObject())
-        );
-    console.log("diagram-viewportBounds", diagram.viewportBounds);
     diagram.model = mk(go.GraphLinksModel, {
         nodeDataArray: [
-            {key: "a", items: ["red", "green"]},
-            {key: "b", items: ["green", "blue", "yellow"]}
+            {key: "a", items: ["red", 34], actions: ["A", "B", "E", "F", "G"]},
+            {key: "b", items: ["green", "blue", "yellow"], actions: ["C", "D"]}
         ],
-        linkDataArray: [
-            {from: "a", to: "b"}
-        ]
+        linkDataArray: []
     });
 </script>
 </body>

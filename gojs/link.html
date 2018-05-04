@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Link</title>
+    <script src="libs/go-debug-p.js"></script>
+</head>
+<body>
+<div id="root" style="width:100%;height:450px;"></div>
+<script>
+    function normalLink() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "root", {
+            initialContentAlignment: go.Spot.Center
+        });
+        diagram.nodeTemplate = mk(go.Node, "Auto",
+            mk(go.Shape, {width: 86, height: 30, fill: "transparent"}),
+            mk(go.TextBlock, new go.Binding("text"))
+        );
+        diagram.linkTemplate = mk(go.Link,
+            mk(go.Shape),
+            mk(go.Shape, {toArrow: "standard"})
+        );
+        var glm = new go.GraphLinksModel(
+            [
+                {key: 1, text: "开始"},
+                {key: 2, text: "结束"}
+            ],
+            [
+                {source: 1, dist: 2}
+            ]
+        );
+        /*
+        * [go.GraphLinksModel].linkFromKeyProperty  该值可以通过 [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回
+        * 如果不设置，默认是 from
+        * [go.GraphLinksModel].linkToKeyProperty 该值可以通过 [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回
+        * 如果不设置，默认是 to
+        */
+        glm.linkFromKeyProperty = "source";
+        glm.linkToKeyProperty = "dist";
+        diagram.model = glm;
+    }
+
+    normalLink();
+</script>
+</body>
+</html>
