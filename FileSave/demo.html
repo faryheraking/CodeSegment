@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>File Save</title>
+    <script src="libs/Blob.js"></script>
+    <script src="libs/FileSaver.js"></script>
+</head>
+<body>
+<form action="/">
+    <input id="saveBtn" type="button" value="保存">
+    <div id="table">
+        <table>
+            <tr>
+                <td>Hello World</td>
+                <td>sunyan</td>
+                <td>lijing</td>
+            </tr>
+        </table>
+    </div>
+
+</form>
+<script>
+    var html="<html><body>"+document.getElementById("table").innerHTML+"</body></html>"
+    document.getElementById("saveBtn").onclick = function (e) {
+        // var blob = new Blob(["Hello World"], {type: "text/plain;charset=utf-8"});
+        var blob = new Blob([html], {type: "application/vnd.ms-excel"});
+        FileSaver.saveAs(blob, "文件导出测试.xls");
+    };
+
+</script>
+</body>
+</html>
