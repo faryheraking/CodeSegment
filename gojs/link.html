@@ -44,7 +44,79 @@
         diagram.model = glm;
     }
 
-    normalLink();
+    //normalLink();
+</script>
+<script>
+    function setLinkColor() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "root", {
+            initialContentAlignment: go.Spot.Center
+        });
+        diagram.nodeTemplate = mk(go.Node, "Auto", {
+                fromLinkable: true,
+                toLinkable: true,
+            },
+            new go.Binding("name"),
+            new go.Binding("stroke"),
+            mk(go.Shape, {width: 86, height: 30, fill: "transparent"}),
+            mk(go.Shape, {width: 86, height: 30, fill: "green"}),
+            mk(go.TextBlock, new go.Binding("text"))
+        );
+
+        diagram.linkTemplate = mk(go.Link, {
+                relinkableFrom: true,
+                relinkableTo: true
+                /*//selectionAdornmentTemplate: adornment,
+                doubleClick: function (inputEvent, graphObject) {
+                    var adornment = m
+                    adornment.adornedObject = graphObject.part;
+                    graphObject.part.addAdornment("doubleClick", adornment)
+                }*/
+            },
+            mk(go.Shape),
+            mk(go.Shape, {toArrow: "standard"})
+        );
+        diagram.linkSelectionAdornmentTemplate = mk(go.Adornment, "Spot", {
+                name: "adornment"
+            },
+            mk(go.Shape, {
+                width: 15, height: 15, fill: "red",
+                click: function (inputEvent, graphObject) {
+                    var adornment = graphObject.part;
+                    graphObject.part.adornedPart.removeAdornment("doubleClick")
+                }
+            })
+        );
+        diagram.addDiagramListener("LinkDrawn", function (diagramEvent) {
+            var link = diagramEvent.subject;
+            var node = link.fromNode;
+            console.log(1, node.stroke);
+        });
+        diagram.addDiagramListener("LinkRelinked", function (diagramEvent) {
+            var link = diagramEvent.subject;
+            var node = link.fromNode;
+            console.log(2, node.name);
+        });
+        var glm = new go.GraphLinksModel(
+            [
+                {key: 1, text: "开始", name: "start", stroke: "red"},
+                {key: 2, text: "结束", name: "end", stroke: "green"},
+                {key: 3, text: "放音", name: "play", stroke: "blue"},
+            ],
+            []
+        );
+        /*
+        * [go.GraphLinksModel].linkFromKeyProperty  该值可以通过 [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回
+        * 如果不设置，默认是 from
+        * [go.GraphLinksModel].linkToKeyProperty 该值可以通过 [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回
+        * 如果不设置，默认是 to
+        */
+        glm.linkFromKeyProperty = "source";
+        glm.linkToKeyProperty = "dist";
+        diagram.model = glm;
+    }
+
+    setLinkColor();
 </script>
 </body>
 </html>

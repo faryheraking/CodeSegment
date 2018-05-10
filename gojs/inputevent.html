@@ -1,0 +1,112 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>inputEvent</title>
+    <script src="libs/go-debug-p.js"></script>
+    <style>
+        html, body {margin: 0;padding: 0;}
+        #root {width: 100%;height: 300px;}
+
+    </style>
+</head>
+<body>
+<div id="root"></div>
+<p id="output"></p>
+<script>
+    var out = document.getElementById("output");
+    var mk = go.GraphObject.make;
+    var diagram = mk(go.Diagram, "root", {
+        initialContentAlignment: go.Spot.TopLeft,
+
+    });
+    /*
+    * Node 中所有元素Shape、TextBlock等都默认相对于Node定位
+    */
+    var node = mk(go.Node, "Auto", {
+            name: "node",
+            margin: 0,
+            padding: 0
+        },
+        mk(go.Shape, {
+            name: "shape", width: 100, height: 100, fill: "green", stroke: null,
+            /*
+            * inputEvent.button 返回鼠标按键 0 左键，1 中键，2 右键
+            * inputEvent.viewPoint 返回事件点相对于视口的坐标[go.Point]
+            * inputEvent.documentPoint 返回事件点相对于文档的坐标[go.Point] ?? 比视口坐标小5px
+            * inputEvent.event 返回原生事件实例对象
+            */
+            click: function (inputEvent, graphObject) {
+                var button = inputEvent.button; // 0
+                if (button === 0) {
+                    out.innerHTML = "左键";
+                }
+
+                var viewPoint = inputEvent.viewPoint;
+                var viewCoordinate = [viewPoint.x, viewPoint.y];
+                out.innerHTML += "/视口坐标点：" + viewCoordinate;
+
+                var documentPoint = inputEvent.documentPoint;
+                var documentCoordinate = [documentPoint.x, documentPoint.y];
+                out.innerHTML += "/文档坐标点：" + documentCoordinate;
+
+                var timestamp = inputEvent.timestamp;
+                out.innerHTML += "/事件发生时间（毫秒）：" + timestamp;
+
+                var localevent = inputEvent.event;
+                out.innerHTML += "/原生事件为：" + localevent.type;  // mouseup
+
+                var clickCount = inputEvent.clickCount;
+                out.innerHTML += "/点击次数为：" + clickCount;
+
+                var diagram = inputEvent.diagram;
+                out.innerHTML += "/事件所在画板为：" + diagram;  // root
+
+                var targetDiagram = inputEvent.targetDiagram;
+                out.innerHTML += "/事件元素所在画板为：" + targetDiagram;  // root
+
+                var targetElement = inputEvent.targetObject;
+                out.innerHTML += "/事件发生的图形对象为：" + targetElement.name;
+            },
+            /*
+            * 双击事件前面总是会触发单击事件
+            * inputEvent.left 返回true表示鼠标左键事件
+            */
+            doubleClick: function (inputEvent, graphObject) {
+                out.innerHTML = "双击";
+
+                var clickCount = inputEvent.clickCount;
+                out.innerHTML += "/点击次数为：" + clickCount;
+
+                var isLeft = inputEvent.left;
+                out.innerHTML += "/是左键事件吗？" + isLeft;
+
+                var isMouseDown = inputEvent.down;
+                out.innerHTML += "/是MouseDown事件吗？" + isMouseDown;
+            },
+            /*
+            * inputEvent.right 返回true表示鼠标右键事件
+            */
+            contextClick: function (inputEvent, graphObject) {
+                var button = inputEvent.button; // 2
+                if (button === 2) {
+                    out.innerHTML = "右键";
+                }
+
+                var isRight = inputEvent.right;
+                out.innerHTML += "/是右键事件吗？" + isRight;
+            },
+
+        }),
+        mk(go.TextBlock, {
+            name: "text", text: "Start",
+
+        })
+    );
+    diagram.add(node);
+</script>
+</body>
+</html>
