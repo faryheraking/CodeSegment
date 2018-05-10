@@ -99,11 +99,67 @@
                 var isRight = inputEvent.right;
                 out.innerHTML += "/是右键事件吗？" + isRight;
             },
+            /*
+            * 事件顺序：mouseEnter--->mouseOver--->mouseLeave
+            * 事件次数：mouseEnter、mouseLeave仅触发一次，mouseOver在鼠标移动过程中连续触发
+            *
+            * mouseOver、mouseHover、mouseHold 可应用于 Diagram
+            * click、doubleClick、contextClick也可应用于 Diagram
+            */
+            mouseEnter: function (inputEvent, graphObject, prev) {
+                inputEvent.event.preventDefault();
+                out.innerHTML = "MouseEnter事件";
 
+                var data = graphObject.part.data;  // 返回 [go.Model].nodeDataArray中绑定的数据对象，无数据绑定返回null
+                console.dir(data);
+                console.dir(prev);
+                /*
+                * graphObject.part.findObject(name) 从可视化树初始节点查找指定名称的元素
+                */
+                var element = graphObject.part.findObject("text");
+                console.log("文本元素文本：", element.text);
+            },
+            mouseOver: function (inputEvent, graphObject) {
+                out.innerHTML = "MouseOver事件";
+            },
+
+            mouseLeave: function (inputEvent, graphObject, next) {
+                out.innerHTML = "MouseLeave事件";
+                console.log(next);
+            },
+            /*
+           * mouseHover 鼠标在元素上长时间停留触发
+           */
+            mouseHover: function (inputEvent, graphObject) {
+                console.log("mouse-hover");
+            },
+            /*
+            * mouseHold 鼠标在元素上按住鼠标左键不动触发
+            */
+            mouseHold: function (inputEvent, graphObject) {
+                console.log("mouse-hold");
+            },
+            /*
+            * 拖动元素到该元素上时触发
+            */
+            mouseDragEnter: function () {
+                console.log("mouse-drag-enter");
+            },
+            /*
+            * 拖动元素离开该元素时触发
+            */
+            mouseDragLeave: function () {
+                console.log("mosue-drag-leave");
+            },
+            /*
+            * 拖动元素放到该元素上时触发
+            */
+            mouseDrop: function () {
+                console.log("mouse-drop");
+            }
         }),
         mk(go.TextBlock, {
             name: "text", text: "Start",
-
         })
     );
     diagram.add(node);
