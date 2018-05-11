@@ -10,8 +10,8 @@
 </head>
 <body>
 <div style="position:relative;">
-    <div id="root" style="width:100%;height:300px;background:#000099;"></div>
-    <div id="palette" style="width:100px;height:300px;position:absolute;left:0;top:0;background:#6D1212;"></div>
+    <div id="root" style="width:100%;height:500px;background:#000099;"></div>
+    <div id="palette" style="width:240px;height:500px;position:absolute;left:0;top:0;background:#6D1212;"></div>
 </div>
 
 <script>
@@ -39,27 +39,32 @@
     );
     /*
     * go.Palette 定义
+    * go.Palette 使用 go.GridLayout 布局
     */
     var palette = mk(go.Palette, "palette", {
-        initialScale: 0.5,
+        initialScale: 0.8,
         layout: mk(go.GridLayout, {
-            alignment: go.GridLayout.LeftToRight
+            alignment: go.GridLayout.LeftToRight,
+            sorting: go.GridLayout.Forward  // 定义模板元素排序
         })
     });
     palette.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
-        mk(go.Shape, {figure: "Rectangle", fill: "transparent", stroke: "#cccccc", width: 20, height: 20}),
-        mk(go.TextBlock, {}, new go.Binding("stroke", "color"), new go.Binding("text", "key"))
+        mk(go.Shape, {figure: "Rectangle", fill: "transparent", stroke: "#cccccc", width: 160, height: 60}),
+        mk(go.TextBlock, {font: "16px sans-serif"}, new go.Binding("stroke", "color"), new go.Binding("text", "key"))
     );
     palette.model = mk(go.Model, {
         nodeDataArray: [
-            {key: "C", color: "cyan"},
-            {key: "LC", color: "lightcyan"},
-            {key: "A", color: "aquamarine"},
-            {key: "T", color: "turquoise"},
-            {key: "PB", color: "powderblue"},
-            {key: "LB", color: "lightblue"},
-            {key: "LSB", color: "lightskyblue"},
-            {key: "DSB", color: "deepskyblue"}
+            {key: "1", color: "cyan"},
+            {key: "2", color: "lightcyan"},
+            {key: "3", color: "aquamarine"},
+            {key: "4", color: "turquoise"},
+            {key: "5", color: "powderblue"},
+            {key: "6", color: "lightblue"},
+            {key: "7", color: "lightskyblue"},
+            {key: "8", color: "deepskyblue"},
+            {key: "9", color: "deepskyblue"},
+            {key: "10", color: "deepskyblue"},
+            {key: "11", color: "deepskyblue"},
         ]
     });
     palette.nodeTemplateMap = diagram.nodeTemplateMap;  // 让palette中的显示与diagram中相同

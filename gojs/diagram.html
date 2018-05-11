@@ -27,7 +27,12 @@
         * [go.Diagram].isEnabled 是否允许用户与画板交互
         * true 允许交互，false 禁止交互
         */
-        isEnabled:false
+        isEnabled: false,
+        /*
+        * 控制画板是否在必要的时候显示滚动条
+        */
+        hasHorizontalScrollbar: true,
+        hasVerticalScrollbar: true
     });
     dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
         mk(go.Panel, {type: go.Panel.Auto},
@@ -49,7 +54,7 @@
     /*
     * [go.Model].isReadOnly 设置数据模型是否可修改
     */
-    dg.model.isReadOnly=false;
+    dg.model.isReadOnly = false;
 
     dg.groupTemplate = mk(go.Group, "Auto", {
             /*

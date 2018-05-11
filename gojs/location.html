@@ -17,6 +17,7 @@
     var mk = go.GraphObject.make;
     var diagram = mk(go.Diagram, "root", {
         //initialContentAlignment: go.Spot.Center
+        padding: 0
     });
     /*
     * Node 中所有元素Shape、TextBlock等都默认相对于Node定位
@@ -28,10 +29,25 @@
         mk(go.Shape, {
             name: "shape", width: 100, height: 100, fill: "green",
             click: function (inputEvent, graphObject) {
+                var shape = graphObject.part;
+                console.log("location", shape.location);
+                console.log("locationObject", shape.locationObject.name);  // node
+                console.log("locationObjectName", shape.locationObjectName);
 
-                console.log("location", graphObject.part.location);
-                console.log("locationObject", graphObject.part.locationObject.name);
-                console.log("locationObjectName", graphObject.part.locationObjectName);
+                var documentPoint = shape.getDocumentPoint(go.Spot.TopLeft);  // 相对于视口
+                console.log("documentPoint", documentPoint.x, documentPoint.y);
+
+                var location = shape.location;
+                console.log("location", location.x, location.y);  // 相对于视口
+
+                var position = shape.position;
+                console.log("position", position.x, position.y);  // 相对于视口
+
+                var viewPoint = inputEvent.viewPoint;
+                console.log("viewPoint", viewPoint.x,viewPoint.y);
+
+                documentPoint = inputEvent.documentPoint;
+                console.log("documentPoint", documentPoint.x,documentPoint.y);
             }
         }),
         mk(go.TextBlock, {
