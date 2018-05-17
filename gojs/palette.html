@@ -38,6 +38,29 @@
         mk(go.TextBlock, {stroke: "#771122"}, new go.Binding("text", "key"))
     );
     /*
+    * 节点从palette拖动到diagram触发
+    */
+    diagram.addDiagramListener("ExternalObjectsDropped", function (diagramEvent) {
+        var selection = diagram.selection;
+        var selectedIterator = selection.iterator;
+        if (selectedIterator.next()) {
+            console.dir(selectedIterator.value.key);
+            var point = selectedIterator.value.location;
+            console.log(go.Point.stringify(point));
+        }
+    });
+    /*
+    *
+    */
+    diagram.addDiagramListener("SelectionMoved", function (diagramEvent) {
+        var selection = diagram.selection;
+        var selectionIterator = selection.iterator;
+        if (selectionIterator.next()) {
+            console.log(selectionIterator.value.key);
+            console.log(selectionIterator.value.data);
+        }
+    });
+    /*
     * go.Palette 定义
     * go.Palette 使用 go.GridLayout 布局
     */

@@ -32,7 +32,21 @@
         * 控制画板是否在必要的时候显示滚动条
         */
         hasHorizontalScrollbar: true,
-        hasVerticalScrollbar: true
+        hasVerticalScrollbar: true,
+        /*
+        * 控制画板是否允许用户滚动
+        * 禁用滚动后鼠标滚轮和画板拖动都不会滚动画板
+        */
+        allowHorizontalScroll: true,
+        allowVerticalScroll: true,
+        /*
+        * 初始化画板时自动缩放到适配视口
+        * 可选值：
+        * go.Diagram.None  画板不会自动缩放，画板区域与视口区域可能不重叠
+        * go.Diagram.Uniform 画板缩放，整个画板区域始在视口区域内
+        * go.Diagram.UniformToFill 画板缩放，单方向画板区域适配视口区域，另一个方向可能会有滚动条
+        */
+        initialAutoScale: go.Diagram.Uniform,
     });
     dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
         mk(go.Panel, {type: go.Panel.Auto},

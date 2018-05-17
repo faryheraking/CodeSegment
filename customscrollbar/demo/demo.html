@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="jquery.mCustomScrollbar.css">
+    <script src="jquery-3.2.1.min.js"></script>
+    <script src="jquery.mCustomScrollbar.concat.min.js"></script>
+    <style>
+        span {width: 50px;height: 50px;}
+        .tab-condition {width: 100%;overflow: hidden;}
+    </style>
+</head>
+<body>
+<div style="width:200px;">
+    <div class="mCustomScrollbar" data-mcs-theme="dark">
+        <!--
+            容器添加 overflow:hidden或overflow:auto是必须的
+            水平滚动：容器子元素宽度必须大于容器宽度才会有滚动条，设置容器最大宽度或宽度
+            垂直滚动：容器子元素高度必须大于容器高度才会有滚动条，设置容器最大高度或高度
+        -->
+        <div class="tab-condition">
+            <p><span
+                    class="actived">1</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span>
+                <span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span><span>2</span>
+            </p>
+        </div>
+    </div>
+</div>
+
+<script>
+    $(function () {
+        $(".tab-condition").mCustomScrollbar({
+            axis: "x",
+            theme: "dark",
+            setWidth: "100px",
+            // scrollButtons:{
+            //     enable:true
+            // },
+            contentTouchScroll: 25
+            //alwaysShowScrollbar:2
+        });
+    });
+</script>
+</body>
+</html>

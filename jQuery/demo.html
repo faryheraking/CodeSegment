@@ -9,7 +9,6 @@
     <script src="jquery-3.2.1.min.js"></script>
 </head>
 <body>
-
 <div id="has-event">绑定事件
     <button>事件</button>
 </div>
@@ -40,11 +39,34 @@
         }
     }
 
-    var v=XX(1);
+    var v = XX(1);
     console.log(v);
 
 
 </script>
+<section>
+    <h2>终止jQuery循环</h2>
+    <div>
+        <div class="items">
+            <p>1</p>
+            <p>2</p>
+            <p>3</p>
+        </div>
+        <script>
+            function breadCycle() {
+                var count = 0;
+                $(".items").children().each(function (i) {
+                    count++;
+                    if (i == 0) {
+                        return false;  // 终止循环
+                    }
+                });
+                console.log("count",count);
+            }
 
+            breadCycle();
+        </script>
+    </div>
+</section>
 </body>
 </html>
