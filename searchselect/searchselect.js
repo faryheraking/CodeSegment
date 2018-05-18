@@ -127,7 +127,7 @@
         },
 
         hoverFirstNotHideItem: function () {
-            this.hoverItem(this.items.find('.searchable-select-item:not(.searchable-select-hide)').first());
+            //this.hoverItem(this.items.find('.searchable-select-item:not(.searchable-select-hide)').first());
         },
 
         selectCurrentHoverItem: function () {
@@ -140,8 +140,8 @@
                 this.hoverFirstNotHideItem();
             else {
                 var prevItem = this.currentHoverItem.prevAll('.searchable-select-item:not(.searchable-select-hide):first')
-                if (prevItem.length > 0)
-                    this.hoverItem(prevItem);
+                if (prevItem.length > 0){}
+                    //this.hoverItem(prevItem);
             }
         },
 
@@ -150,8 +150,8 @@
                 this.hoverFirstNotHideItem();
             else {
                 var nextItem = this.currentHoverItem.nextAll('.searchable-select-item:not(.searchable-select-hide):first')
-                if (nextItem.length > 0)
-                    this.hoverItem(nextItem);
+                if (nextItem.length > 0){}
+                    //this.hoverItem(nextItem);
             }
         },
 
@@ -162,7 +162,7 @@
 
                 if (this.selected) {
                     _this.selectItem(item);
-                    _this.hoverItem(item);
+                    //_this.hoverItem(item);
                 }
 
                 item.on('mouseenter', function () {
@@ -209,7 +209,7 @@
             this.currentSelectedItem = item;
             item.addClass('selected');
 
-            this.hoverItem(item);
+            //this.hoverItem(item);
 
             this.holder.text(item.text());
             var value = item.data('value');
@@ -230,8 +230,10 @@
                 this.currentHoverItem.removeClass('hover');
 
             if (item.outerHeight() + item.position().top > this.items.height())
+                //
                 this.items.scrollTop(this.items.scrollTop() + item.outerHeight() + item.position().top - this.items.height());
             else if (item.position().top < 0)
+                //
                 this.items.scrollTop(this.items.scrollTop() + item.position().top);
 
             this.currentHoverItem = item;

@@ -13,7 +13,11 @@
 <script>
     var mk = go.GraphObject.make;
     var dg = mk(go.Diagram, "root", {
-        contentAlignment: go.Spot.Center,
+        /*
+        * 设置画板坐标原点
+        */
+        initialContentAlignment: go.Spot.Center,
+        contentAlignment: go.Spot.TopLeft,
         /*
         * [go.Diagram].DocumentScroll 滚动到文档边缘，默认值
         * [go.Diagram].InfiniteScroll 无限滚动
@@ -22,12 +26,12 @@
         /*
         * [go.Diagram].isReadOnly 画板是否只读，只读状态下画板不可编辑
         */
-        isReadOnly: true,
+        isReadOnly: false,
         /*
         * [go.Diagram].isEnabled 是否允许用户与画板交互
         * true 允许交互，false 禁止交互
         */
-        isEnabled: false,
+        isEnabled: true,
         /*
         * 控制画板是否在必要的时候显示滚动条
         */
@@ -40,6 +44,12 @@
         allowHorizontalScroll: true,
         allowVerticalScroll: true,
         /*
+        * 控制画板部件是否允许Ctrl+X、Ctrl+C、Ctrl+V剪切复制粘贴操作
+        */
+        allowClipboard:false,
+        allowCopy:true,
+        allowDelete:true,
+        /*
         * 初始化画板时自动缩放到适配视口
         * 可选值：
         * go.Diagram.None  画板不会自动缩放，画板区域与视口区域可能不重叠
@@ -47,6 +57,20 @@
         * go.Diagram.UniformToFill 画板缩放，单方向画板区域适配视口区域，另一个方向可能会有滚动条
         */
         initialAutoScale: go.Diagram.Uniform,
+        /*
+        * 启用undo和redo
+        */
+        "undoManager.isEnabled": true,
+        /*
+        * 配置画板网格
+        */
+        "grid.visible": true,
+        grid: G_$(go.Panel, "Grid",
+            G_$(go.Shape, "LineH", {stroke: "lightgray"}),
+            G_$(go.Shape, "LineH", {stroke: "gray",interval: 50}),
+            G_$(go.Shape, "LineV", {stroke: "lightgray"}),
+            G_$(go.Shape, "LineV", {stroke: "gray",interval: 50})
+        ),
     });
     dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
         mk(go.Panel, {type: go.Panel.Auto},
