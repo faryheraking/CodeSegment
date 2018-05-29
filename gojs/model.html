@@ -22,8 +22,14 @@
         diagram.nodeTemplate = mk(go.Node, "Auto",
             new go.Binding("location", "loc", go.Point.parse).makeTwoWay(go.Point.stringify),
             mk(go.Panel, "Spot",
-                mk(go.Shape, {width: 86, height: 30, fill: "transparent"}),
-                mk(go.TextBlock, new go.Binding("text"))
+                mk(go.Shape, {width: 200, height: NaN, fill: "transparent"},
+                    /*
+                    * [go.Binding].ofModel()
+                    * [go.Shape].stroke=[go.Model].modelData.stroke
+                    */
+                    new go.Binding("stroke", "stroke").ofModel()
+                ),
+                mk(go.TextBlock, {editable: true}, new go.Binding("text"))
             ),
         );
         diagram.linkTemplate = mk(go.Link,
@@ -47,10 +53,19 @@
         */
         glm.linkFromKeyProperty = "source";
         glm.linkToKeyProperty = "dist";
+        /*
+        * [go.Model].modelData 节点和链接共享数据，会输出到JSON数据
+        * [go.Binding].ofModel() 即切换缩写数据源 [go.Model].nodeDataArray 为 [go.Model].modelData
+        */
+        glm.modelData = {
+            play: "放音",
+            stroke: "red"
+        };
         diagram.model = glm;
 
         var modelJson = "";
         var textarea = document.getElementById("json");
+
         document.getElementById("save").onclick = function () {
             /*
             * [go.Diagram.model].toJson() 将模型数据以JSON字符串输出
@@ -59,6 +74,7 @@
             console.dirxml(diagram.model);
             textarea.value = modelJson;
         };
+
         document.getElementById("draw").onclick = function () {
             console.log(modelJson);
             diagram.model = go.Model.fromJson(textarea.value);

@@ -46,9 +46,9 @@
         /*
         * 控制画板部件是否允许Ctrl+X、Ctrl+C、Ctrl+V剪切复制粘贴操作
         */
-        allowClipboard:false,
-        allowCopy:true,
-        allowDelete:true,
+        allowClipboard: false,
+        allowCopy: true,
+        allowDelete: true,
         /*
         * 初始化画板时自动缩放到适配视口
         * 可选值：
@@ -65,17 +65,25 @@
         * 配置画板网格
         */
         "grid.visible": true,
-        grid: G_$(go.Panel, "Grid",
-            G_$(go.Shape, "LineH", {stroke: "lightgray"}),
-            G_$(go.Shape, "LineH", {stroke: "gray",interval: 50}),
-            G_$(go.Shape, "LineV", {stroke: "lightgray"}),
-            G_$(go.Shape, "LineV", {stroke: "gray",interval: 50})
+        grid: mk(go.Panel, "Grid",
+            mk(go.Shape, "LineH", {stroke: "lightgray"}),
+            mk(go.Shape, "LineH", {stroke: "gray", interval: 50}),
+            mk(go.Shape, "LineV", {stroke: "lightgray"}),
+            mk(go.Shape, "LineV", {stroke: "gray", interval: 50})
         ),
     });
-    dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal},
-        mk(go.Panel, {type: go.Panel.Auto},
-            mk(go.Shape, {figure: "Rectangle", stroke: "#996644", fill: null, width: 100, height: 100}),
-            mk(go.TextBlock, new go.Binding("text", "text"))
+    dg.nodeTemplate = mk(go.Node, {type: go.Panel.Horizontal, name: "node"},
+        mk(go.Panel, {type: go.Panel.Auto, name: "panel"},
+            mk(go.Shape, {figure: "Rectangle", stroke: "#996644", width: 100, height: 100, name: "shape"},
+                new go.Binding("fill", "isSelected", function (sel) {
+                    if (sel) {
+                        return "#996644";
+                    } else {
+                        return null;
+                    }
+                }).ofObject()  // 不传参数或传空字符串，表示根节点go.Node
+            ),
+            mk(go.TextBlock, {name: "text"}, new go.Binding("text", "text"))
         )
     );
 
@@ -117,25 +125,28 @@
         })
     );
 
-    dg.groupTemplate =
-        mk(go.Group, "Auto",
-            {layout: mk(go.TreeLayout)},
-            mk(go.Shape, "Rectangle", {fill: "orange", stroke: "darkorange"}),
-            mk(go.Panel, "Table", {margin: 0.5},
-                mk(go.RowColumnDefinition, {row: 0, background: "white"}),  // header is white
-                mk("SubGraphExpanderButton", {row: 0, column: 0, margin: 3}),
-                mk(go.TextBlock, {
-                        row: 0, column: 1, font: "bold 14px Sans-Serif", stroke: "darkorange",
-                        textAlign: "center", stretch: go.GraphObject.UniformToFill
-                    },
-                    new go.Binding("text")),
-                mk(go.Placeholder, {row: 1, columnSpan: 2, padding: 10, alignment: go.Spot.TopLeft},
-                    new go.Binding("padding", "isSubGraphExpanded",
-                        function (exp) {
-                            return exp ? 10 : 0;
-                        }).ofObject())
-            )
-        );
+    dg.groupTemplate = mk(go.Group, "Auto", {layout: mk(go.TreeLayout)},
+        mk(go.Shape, "Rectangle", {fill: "orange", stroke: "darkorange"}),
+        mk(go.Panel, "Table", {margin: 0.5},
+            mk(go.RowColumnDefinition, {row: 0, background: "white"}),  // header is white
+            mk("SubGraphExpanderButton", {row: 0, column: 0, margin: 3}),
+            mk(go.TextBlock, {
+                    row: 0, column: 1, font: "bold 14px Sans-Serif", stroke: "darkorange",
+                    textAlign: "center", stretch: go.GraphObject.UniformToFill
+                },
+                new go.Binding("text")),
+            mk(go.Placeholder, {
+                    row: 1,
+                    columnSpan: 2,
+                    padding: 10,
+                    alignment: go.Spot.TopLeft,
+                    background: "transparent"
+                },
+                new go.Binding("padding", "isSubGraphExpanded", function (exp) {
+                    return exp ? 10 : 0;
+                }).ofObject())
+        )
+    );
 
     dg.layout = mk(go.TreeLayout, {isRealtime: false});
 
@@ -150,6 +161,12 @@
         {from: 3, to: 4},
         {from: 1, to: 5}
     ]);
+    /*
+    * [go.Diagram].div 返回绑定画板的dom
+    * go.Diagram.fromDiv(string|element) 返回绑定dom的画板
+    */
+    console.log(dg.div);
+    console.log(go.Diagram.fromDiv("root").div);
 </script>
 </body>
 </html>
