@@ -10,6 +10,7 @@
 </head>
 <body>
 <div id="root" style="width:100%;height:450px;"></div>
+<div><input id="del-link" type="button" value="删除一条链接"></div>
 <script>
     function normalLink() {
         var mk = go.GraphObject.make;
@@ -20,28 +21,52 @@
             mk(go.Shape, {width: 86, height: 30, fill: "transparent"}),
             mk(go.TextBlock, new go.Binding("text"))
         );
-        diagram.linkTemplate = mk(go.Link,
+        diagram.linkTemplate = mk(go.Link, {
+                routing: go.Link.Orthogonal,
+                resegmentable: true,
+                reshapable: true,
+                selectable: true
+            },
             mk(go.Shape),
             mk(go.Shape, {toArrow: "standard"})
         );
         var glm = new go.GraphLinksModel(
             [
                 {key: 1, text: "开始"},
-                {key: 2, text: "结束"}
+                {key: 2, text: "结束"},
+                {key: 3, text: "录音"}
             ],
             [
-                {source: 1, dist: 2}
+                {key: 1, source: 1, dist: 2},
+                {key: 2, source: 1, dist: 3}
             ]
         );
         /*
-        * [go.GraphLinksModel].linkFromKeyProperty  该值可以通过 [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回
-        * 如果不设置，默认是 from
-        * [go.GraphLinksModel].linkToKeyProperty 该值可以通过 [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回
-        * 如果不设置，默认是 to
-        */
+         * [go.GraphLinksModel].linkFromKeyProperty  该值可以通过 [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回
+         * 如果不设置，默认是 from
+         * [go.GraphLinksModel].linkToKeyProperty 该值可以通过 [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回
+         * 如果不设置，默认是 to
+         */
         glm.linkFromKeyProperty = "source";
         glm.linkToKeyProperty = "dist";
+        /*
+         * @obj JavaScriptObject
+         * @glm GraphLinksModel
+         */
+        glm.copyLinkDataFunction = function (obj, glm) {
+            console.dir(obj);
+        };
         diagram.model = glm;
+
+        //var it = diagram.links;
+        //it.next();
+        //console.dir(it.value.data);
+        //glm.removeLinkData(it.value.data);
+
+        var linkData = glm.findLinkDataForKey(2);
+        console.log(linkData);
+        glm.removeLinkData(linkData);
+
     }
 
     //normalLink();
@@ -66,12 +91,12 @@
         diagram.linkTemplate = mk(go.Link, {
                 relinkableFrom: true,
                 relinkableTo: true
-                /*//selectionAdornmentTemplate: adornment,
-                doubleClick: function (inputEvent, graphObject) {
-                    var adornment = m
-                    adornment.adornedObject = graphObject.part;
-                    graphObject.part.addAdornment("doubleClick", adornment)
-                }*/
+                    /*//selectionAdornmentTemplate: adornment,
+                     doubleClick: function (inputEvent, graphObject) {
+                     var adornment = m
+                     adornment.adornedObject = graphObject.part;
+                     graphObject.part.addAdornment("doubleClick", adornment)
+                     }*/
             },
             mk(go.Shape),
             mk(go.Shape, {toArrow: "standard"})
@@ -83,7 +108,7 @@
                 width: 15, height: 15, fill: "red",
                 click: function (inputEvent, graphObject) {
                     var adornment = graphObject.part;
-                    graphObject.part.adornedPart.removeAdornment("doubleClick")
+                    graphObject.part.adornedPart.removeAdornment("doubleClick");
                 }
             })
         );
@@ -106,17 +131,99 @@
             []
         );
         /*
-        * [go.GraphLinksModel].linkFromKeyProperty  该值可以通过 [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回
-        * 如果不设置，默认是 from
-        * [go.GraphLinksModel].linkToKeyProperty 该值可以通过 [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回
-        * 如果不设置，默认是 to
-        */
+         * [go.GraphLinksModel].linkFromKeyProperty  该值可以通过 [go.GraphLinksModel].getFromKeyForLinkData(link_data) 返回
+         * 如果不设置，默认是 from
+         * [go.GraphLinksModel].linkToKeyProperty 该值可以通过 [go.GraphLinksModel].getToKeyForLinkData(link_data) 返回
+         * 如果不设置，默认是 to
+         */
         glm.linkFromKeyProperty = "source";
         glm.linkToKeyProperty = "dist";
         diagram.model = glm;
     }
 
-    setLinkColor();
+    //setLinkColor();
+</script>
+<script>
+    function deleteLink() {
+        var mk = go.GraphObject.make;
+        var diagram = mk(go.Diagram, "root", {
+            "undoManager.isEnabled": true,
+            //initContentAlignment: go.Spot.Center
+        });
+
+        diagram.nodeTemplate = mk(go.Node, "Auto",
+            mk(go.Shape, {width: 200, height: 60, stroke: null}, new go.Binding("fill", "color")),
+            mk(go.TextBlock, new go.Binding("text", "text"))
+        );
+
+        var initLinkKey = 1;
+
+        var model = mk(go.GraphLinksModel, {
+            linkKeyProperty: "linKey",
+            makeUniqueLinkKeyFunction: function (graphLinksModel, object) {
+                console.count("linKey");
+                console.log(initLinkKey);
+                // console.log(graphLinksModel.linkKeyProperty);
+                // graphLinksModel.startTransaction("change");
+                // graphLinksModel.setKeyForLinkData(object, initLinkKey++);
+                // graphLinksModel.commitTransaction("change");
+                // console.dir(object);
+                // console.log(graphLinksModel.getKeyForLinkData(object));
+                return initLinkKey++;
+            },
+            nodeDataArray: [
+                {key: 1, text: "AA", color: "red"},
+                {key: 2, text: "BB", color: "green"},
+                {key: 3, text: "CC", color: "blue"},
+                {key: 4, text: "DD", color: "yellow"}
+            ],
+            linkDataArray: [
+                {from: 1, to: 2},
+                {from: 2, to: 3}
+            ]
+        });
+
+        model.addLinkData({from: 3, to: 4});
+
+        diagram.model = model;
+
+        document.getElementById("del-link").onclick = function () {
+            removeLinkData();
+        };
+
+        console.log("linkDataArray");
+        console.dir(diagram.model.linkDataArray);
+        function setNewLinkDataArray() {
+            var linkDataArray = diagram.model.linkDataArray, _linkDataArray = [];
+            for(var i = 0, len = linkDataArray.length; i < len; i++) {
+                if(linkDataArray[i].linKey !== -1) {
+                    _linkDataArray.push(linkDataArray[i]);
+                }
+            }
+            model.startTransaction("link-data");
+            model.linkDataArray = _linkDataArray;
+            model.commitTransaction("link-data");
+            diagram.model = model;
+        }
+
+        function removeLinkData() {
+            var linkDataArray = diagram.model.linkDataArray;
+            for(var i = 0; i < linkDataArray.length; i++) {
+                if(linkDataArray[i].from === 2 || linkDataArray[i].to === 2) {
+                    var linkdata = diagram.model.findLinkDataForKey(linkDataArray[i].linKey);
+                    diagram.model.startTransaction("remove-link");
+                    diagram.model.removeLinkData(linkdata);
+                    diagram.model.commitTransaction("remove-link");
+                    linkDataArray = diagram.model.linkDataArray;
+                    i = -1;
+                }
+            }
+
+        }
+
+    }
+
+    deleteLink();
 </script>
 </body>
 </html>
