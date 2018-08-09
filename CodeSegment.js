@@ -37,3 +37,47 @@ Date.prototype.Format = function (fmt) {
     return fmt;
 };
 
+/*
+* 实时检查输入内容的长度
+* @param $textForm $(input)、$(textarea)
+* @param max the max length of input text
+* @param msgClass the tip dom class
+*/
+function InputingTextLength($textForm, max, msgClass) {
+    var $msg = $('<br><span>还可输入<b class="' + msgClass + '">' + max + '</b>字</span>');
+    var $num = $msg.find("." + msgClass);
+    var isInputEnd = undefined;
+
+    function checkInput() {
+        var inputText = $textForm.val();
+        var canInputNum = max - inputText.length;
+        if (canInputNum < 0) {
+            alert("最多只能输入" + max + "个字符");
+            $textForm.val(inputText.substring(0, max));
+            return;
+        }
+        $num.text(canInputNum);
+    }
+
+    $textForm.after($msg);
+    /*
+    * 触发顺序：compositionstart、input、compositionend
+    */
+    $textForm.bind("input", function () {
+        if (isInputEnd === undefined) {
+            checkInput();
+        } else if (isInputEnd) {
+            checkInput();
+        }
+    });
+    // 中文输入开始
+    $textForm.bind("compositionstart", function () {
+        isInputEnd = false;
+    });
+    // 中文输入结束
+    $textForm.bind("compositionend", function () {
+        isInputEnd = true;
+        if (isInputEnd) checkInput();
+    });
+}
+

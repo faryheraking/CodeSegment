@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <style>
+        /*textarea{white-space:pre-line;}*/
+    </style>
+</head>
+<body>
+<section>
+    <h2>textarea</h2>
+    <div>
+        <form action="">
+            <textarea name="" id="tt" cols="30" rows="10"></textarea>
+            <pre id="tt2"></pre>
+        </form>
+        <script>
+            var textarea = document.getElementById("tt");
+            var pre = document.getElementById("tt2");
+            var str = "111<br>222<br>333";
+            textarea.innerHTML = str.replace(/<br>/gm, "\r\n");
+            pre.innerText = str;
+        </script>
+    </div>
+</section>
+
+<section>
+    <h2>input-file</h2>
+    <div>
+        <form action="">
+            <input type="file" name="file" id="file">
+            <pre id="file-out"></pre>
+        </form>
+        <script>
+            var file = document.getElementById("file");
+            var fileOut = document.getElementById("file-out");
+            file.focus();
+            file.defaultValue = "Jellyfish.jpg";
+            file.onchange = function () {
+                fileOut.innerHTML = this.value;  // path
+                fileOut.innerHTML += " / " + this.files[0].name;  // fileName
+                fileOut.innerHTML += " / " + this.files[0].type;  // fileType
+                console.dir(this.select());
+            };
+        </script>
+    </div>
+</section>
+
+<section>
+    <h2>select</h2>
+    <div>
+        <form action="">
+            <select name="" id="" style="width:200px;" size="10">
+                <optgroup label="第一组" style="color:red;line-height:50px;">
+                    <option value="">1</option>
+                    <option value="">1</option>
+                    <option value="">1</option>
+                </optgroup>
+                <optgroup label="第二组">
+                    <option value="">2</option>
+                    <option value="">2</option>
+                    <option value="">2</option>
+                    <option value="">2</option>
+                </optgroup>
+            </select>
+        </form>
+    </div>
+</section>
+
+<section>
+    <h2></h2>
+    <div>
+        <select size="1" style="height:100px;">
+            <option value="1" style="height:60px;" selected>1</option>
+        </select>
+    </div>
+</section>
+</body>
+</html>

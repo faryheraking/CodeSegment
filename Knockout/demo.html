@@ -1,0 +1,257 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="jquery-1.7.1.min.js"></script>
+    <script src="jquery.livequery.js"></script>
+    <script src="knockout-3.4.2.js"></script>
+    <script src="knockout.multimodels-0.1.js"></script>
+</head>
+<body>
+<div>
+    <!-- 多Model设置 data-model -->
+    <div data-model="first">
+        <div data-bind="foreach:names">
+            <p>
+                <!-- $index 代表foreach执行环境当前执行数据项的索引 -->
+                <span data-bind="text:$index"></span>
+                <span data-bind="text:name"></span>
+            </p>
+            <p data-bind="text:$data.name"></p>
+        </div>
+        <div data-bind="foreach:colors">
+            <!-- $data 代表foreach执行环境当前执行的数据项 -->
+            <p data-bind="text:$data"></p>
+            <!-- $parent 代表foreach执行环境外层的执行环境 -->
+            <p data-bind="text:$parent.mainName"></p>
+        </div>
+        <div data-bind="foreach:{data:colors,as:'color'}">
+            <p data-bind="text:color"></p>
+        </div>
+        <div>
+            <p id="customes" data-bind="customeName:customeValue,isCustome:true"></p>
+        </div>
+        <div>
+            <input type="checkbox" data-bind="checked:isShow">
+            <p data-bind="if:isShow">隐藏的内容</p>
+            <p data-bind="ifnot:isShow">显示的内容1</p>
+            <p data-bind="if:!isShow2">显示的内容2</p>
+        </div>
+        <div>
+            <p data-bind="text:whole"></p>
+        </div>
+        <div>
+            <input data-bind="textInput:number">
+            <input type="text" data-bind="hasFocus:focus">
+            <p data-bind="text:number"></p>
+        </div>
+        <div>
+            <input type="text" data-bind="value:number">
+            <p data-bind="text:number"></p>
+        </div>
+        <div>
+            <input type="radio" name="color" data-bind="checked:red" value="red"><span data-bind="if:isRed">红</span>
+            <input type="radio" name="color" data-bind="checked:red" value="green"><span
+                data-bind="ifnot:isRed">绿</span>
+        </div>
+        <div>
+            <input type="checkbox" data-bind="checked:mm" value="a"><span data-bind="if:isa">a</span>
+            <input type="checkbox" data-bind="checked:mm" value="b"><span data-bind="if:isb">b</span>
+            <input type="checkbox" data-bind="checked:mm" value="c"><span data-bind="if:isc">c</span>
+        </div>
+    </div>
+    <script>
+        const VM = function () {
+            this.start = ko.observable("hello");
+            this.end = ko.observable("world");
+            this.whole = ko.pureComputed(function () {
+                return this.start() + "+" + this.end();
+            }, this);
+            this.number = ko.observable(0);
+            this.focus = ko.computed(function () {
+                return this.number;
+            }, this);
+            this.customeValue = ko.observable("custome");
+            this.isShow = ko.observable(false);
+            this.mainName = ko.observable("Konckout");
+            this.names = ko.observableArray([
+                {name: "vm1"},
+                {name: "vm2"}
+            ]);
+            this.colors = ko.observable([
+                "red", "green", "blue"
+            ]);
+
+            this.red = ko.observable("red");  // 单选按钮数据绑定
+            this.isRed = ko.pureComputed(function () {
+                return this.red() === "red";
+            }, this);
+
+            this.mm = ko.observable(['a', 'c']);  // 复选框数据绑定
+            this.isa = ko.computed(function () {
+                return this.mm().indexOf('a') > -1;
+            }, this);
+            this.isb = ko.computed(function () {
+                return this.mm().indexOf('b') > -1;
+            }, this);
+            this.isc = ko.computed(function () {
+                return this.mm().indexOf('c') > -1;
+            }, this);
+            this.isShow2 = ko.computed(function () {
+                return !this.isShow();
+            }, this, {pure: true});
+            /*
+             * ko.isComputed(attribute)  判断属性是否是一个计算属性
+             * ko.isPureComputed(attribute) 判断属性是否是一个纯计算属性
+             * ko.isObservable(attribute) 判断属性是否是一个监听属性
+             * ko.isWritableObservable(attribute) 判断属性是否是一个可写的监听属性
+             */
+            console.log(ko.isComputed(this.start));  //false
+            console.log(ko.isComputed(this.whole));  //true
+            console.log(ko.isPureComputed(this.whole));  //true
+            console.log(ko.isObservable(this.isShow));  //true
+            console.log(ko.isWritableObservable(this.isShow));  //true
+
+            ko.bindingHandlers.customeName = {
+                /*
+                 * element 绑定DOM元素
+                 */
+                init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    // valueAccessor() 返回模型数据，但需要通过ko.unwrap()获取返回的值
+                    console.log(ko.unwrap(valueAccessor()));  // custome
+                    console.log(allBindings.get("isCustome"));  // true
+                    console.log(viewModel);
+                    console.log(bindingContext.$data);
+                },
+                update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                    console.dirxml(element);
+                    console.log(ko.unwrap(valueAccessor()));  // custome
+                    console.log(allBindings.get("isCustome"));  // true
+                    console.log(viewModel);
+                    console.log(bindingContext.$data);
+                }
+            };
+        };
+        //ko.applyBindings(new VM());
+        ko.attach("first", new VM());
+    </script>
+
+    <!-- 多Model设置 data-model -->
+    <div data-model="second">
+        <!-- visible相当于 display:none,display:block -->
+        <p data-bind="visible:show">显示</p>
+        <p data-bind="visible:hide">隐藏</p>
+        <!-- text相当于 innerText/textContent -->
+        <p data-bind="text:text"></p>
+        <!-- html相当于 innerHTML -->
+        <p data-bind="html:call"></p>
+        <!-- 添加的class是add的值 -->
+        <p data-bind="css:add">添加class='show'</p>
+        <!-- 添加的class是add,但仅当show的值为true时添加 -->
+        <p data-bind="css:{add:show()}">添加class='add'</p>
+        <!-- 添加多个class,每个class有自己的条件 -->
+        <p data-bind="css:{call:show(),incall:show()}">添加class='call incall'</p>
+        <!-- 添加多个class,所有class共用一个条件 -->
+        <p data-bind="css:{'call incall':show()}">添加class='call incall'</p>
+        <!-- 添加短线class,必须使用引号属性 -->
+        <p data-bind="css:{'in-call outcall':show()}">添加class='in-call outcall'</p>
+        <!-- 样式属性Camel命名，样式值加引号 -->
+        <p data-bind="style:{color:'red',fontWeight:'bold'}">红色加粗</p>
+        <!-- attr添加属性 -->
+        <p data-bind="attr:{id:id(),title:title()}">添加id和title</p>
+    </div>
+    <script>
+        const VM2 = function () {
+            this.show = ko.observable(true);
+            this.hide = ko.observable(false);
+            this.text = ko.observable("呼叫");
+            this.call = ko.observable('<b>呼叫</b>');
+            this.add = ko.pureComputed(function () {
+                return "show";
+            }, this);
+            this.id = ko.observable("test");
+            this.title = ko.observable("this is a p");
+        };
+        //ko.applyBindings(new VM2());
+        ko.attach("second", new VM2());
+    </script>
+    <div data-model="flow">
+        <p data-bind="text:blue"></p>
+        <!-- width创建了嵌套的执行环境，外层执行环境使用$parent -->
+        <div data-bind="with:Color">
+            <p data-bind="text:red"></p>
+            <p data-bind="text:green"></p>
+            <p data-bind="text:$parent.blue"></p>
+        </div>
+    </div>
+    <script>
+        const VM3 = function () {
+            this.blue = ko.observable("蓝");
+            this.Color = ko.observable();
+        };
+        const vm3 = new VM3();
+        vm3.Color({
+            red: "红", green: "绿"
+        });
+        ko.attach("flow", vm3);
+    </script>
+    <!-- 组件 -->
+    <div data-model="component">
+        <p data-bind="text:markName"></p>
+        <my-mark params="{name:markName}"></my-mark>
+        <my-mark params="{name:markName}"></my-mark>
+        <my-com></my-com>
+        <my-com></my-com>
+    </div>
+    <script>
+        const VM5 = function () {
+            this.markName = ko.observable("mark");
+        };
+
+        ko.components.register("my-mark", {
+            viewModel: function (params) {
+                // property
+                this.comName = ko.observable(params.name);
+                // behavior
+                this.getName = function () {
+                    return this.comName();
+                }.bind(this);
+                this.setName = function (name) {
+                    this.comName(name);
+                }.bind(this);
+                this.changeName = function () {
+                    this.setName("mmm-mark");
+                };
+            },
+            template: '<div>\
+                          <p data-bind="text:comName()"></p>\
+                          <input type="text" data-bind="textInput:comName()">\
+                          <p data-bind="click:changeName">改变</p>\
+                        </div>'
+        });
+
+        // 共享Model
+        const comViewModel = {
+            name: ko.observable("front"),
+            changeName: function () {
+                this.name("back");
+            }
+        };
+        ko.components.register("my-com", {
+            viewModel: {instance: comViewModel},
+            template: '<div>\
+                        <p data-bind="text:name"></p>\
+                        <p data-bind="click:changeName">改变</p>\
+                      </div>'
+        });
+
+        ko.attach("component", new VM5());
+    </script>
+
+</div>
+</body>
+</html>
