@@ -199,59 +199,64 @@
         });
         ko.attach("flow", vm3);
     </script>
-    <!-- 组件 -->
-    <div data-model="component">
-        <p data-bind="text:markName"></p>
-        <my-mark params="{name:markName}"></my-mark>
-        <my-mark params="{name:markName}"></my-mark>
-        <my-com></my-com>
-        <my-com></my-com>
+
+    <div data-model="bindarray">
+        <ul data-bind="foreach:arr">
+            <li><p data-bind="text:$data"></p></li>
+        </ul>
+        <ul data-bind="foreach:arr2">
+            <li>
+                <p data-bind="text:$data"></p>
+            </li>
+        </ul>
     </div>
     <script>
-        const VM5 = function () {
-            this.markName = ko.observable("mark");
+        const VM6 = function () {
+            this.arr = ko.observableArray([1, 2, 3, 4]);
+            this.arr2 = ko.observable(["makecall", "outringing", "outcall"]);
         };
-
-        ko.components.register("my-mark", {
-            viewModel: function (params) {
-                // property
-                this.comName = ko.observable(params.name);
-                // behavior
-                this.getName = function () {
-                    return this.comName();
-                }.bind(this);
-                this.setName = function (name) {
-                    this.comName(name);
-                }.bind(this);
-                this.changeName = function () {
-                    this.setName("mmm-mark");
-                };
-            },
-            template: '<div>\
-                          <p data-bind="text:comName()"></p>\
-                          <input type="text" data-bind="textInput:comName()">\
-                          <p data-bind="click:changeName">改变</p>\
-                        </div>'
-        });
-
-        // 共享Model
-        const comViewModel = {
-            name: ko.observable("front"),
-            changeName: function () {
-                this.name("back");
-            }
-        };
-        ko.components.register("my-com", {
-            viewModel: {instance: comViewModel},
-            template: '<div>\
-                        <p data-bind="text:name"></p>\
-                        <p data-bind="click:changeName">改变</p>\
-                      </div>'
-        });
-
-        ko.attach("component", new VM5());
+        const vm6 = new VM6();
+        ko.attach("bindarray", vm6);
+        vm6.arr.push(5);
     </script>
-
+    <!-- 模板绑定 -->
+    <div data-model="templatetest">
+        <!--
+            Knockout 首先查找data，如果没有则查找foreach
+        -->
+        <div data-bind="template:{name:'person-template',data:person}"></div>
+        <div data-bind="template:{name:'person-template',foreach:persons}"></div>
+        <!--
+            as给遍历的foreach项填充标识符，必须使用引号，否则会当成变量
+            在嵌套模板中，别名可以当变量使用
+        -->
+        <div data-bind="template:{name:'firstlevel',foreach:persons,as:'person'}"></div>
+    </div>
+    <script type="text/html" id="person-template">
+        <div>
+            <p data-bind="text:name"></p>
+            <p data-bind="text:work"></p>
+        </div>
+    </script>
+    <script type="text/html" id="firstlevel">
+        <div>
+            <p data-bind="template:{name:'secondlevel',foreach:colors,as:'color'}"></p>
+        </div>
+    </script>
+    <script type="text/html" id="secondlevel">
+        <span data-bind="text:person.name"></span>
+        <span data-bind="text:color"></span>
+    </script>
+    <script>
+        const VM7 = function () {
+            this.person = {name: "超宝", work: "程序员"};
+            this.persons = [
+                {name: "曹亮", work: "程序员", colors: ["红", "绿"]},
+                {name: "超宝", work: "程序员", colors: ["橙", "黄"]}
+            ];
+        };
+        ko.attach("templatetest", new VM7());
+    </script>
 </div>
 </body>
 </html>
