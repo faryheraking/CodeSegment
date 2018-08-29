@@ -1,0 +1,80 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../../jQuery/jquery-3.1.0.min.js"></script>
+    <style>
+        html, body, p {margin: 0;padding: 0;}
+        #parent {width: 300px;height: 150px;overflow: scroll;outline: 1px solid red;position: relative;left: 20%;top: 50px;}
+        #content {background: #00CCCC;}
+    </style>
+</head>
+<body>
+<div id="parent">
+    <div id="content">
+        <p>1111</p>
+        <p>2222</p>
+        <p>3333</p>
+        <p>4444</p>
+        <p>5555</p>
+        <p>6666</p>
+        <p>7777</p>
+        <p>8888</p>
+        <p>9999</p>
+        <p>1111</p>
+        <p>2222</p>
+        <p>3333</p>
+        <p>4444</p>
+        <p>5555</p>
+        <p>6666</p>
+        <p>7777</p>
+        <p>8888</p>
+        <p>9999</p>
+
+    </div>
+</div>
+<div>
+    <p id="parent-height"></p>
+    <p id="content-height"></p>
+    <p id="content-top"></p>
+    <p id="content-stop"></p>
+</div>
+<script>
+    (function () {
+        var parentHeight = $("#parent").height();
+        $("#parent-height").text("容器高度：" + parentHeight + " px");
+        var contentHeight = $("#content").height();
+        $("#content-height").text("内容高度：" + contentHeight + " px");
+        var top = $("#content").offset().top;
+        $("#content-top").text("内容上空间：" + top + " px");
+
+        var stop = $("#parent").scrollTop();
+        $("#content-stop").text("内容上滚动：" + stop + " px");
+        $("#parent").scrollTop(100);
+
+
+        var id, i = 0, st = $("#parent").scrollTop();
+        var scroll = function () {
+            $("#content-stop").text("内容上滚动：" + st + " px");
+            var $p = $("#content p").eq(i++);
+            if(st >= contentHeight - parentHeight) {
+                st += $p.height();
+                $("#parent").scrollTop(st);
+                id = setTimeout(function () {
+                    scroll();
+                }, 1000);
+            } else {
+                alert("滚动到底了");
+            }
+        };
+        scroll();
+
+
+    })();
+</script>
+</body>
+</html>
