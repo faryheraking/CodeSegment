@@ -1,0 +1,38 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<a href="browser.html">跳转</a>
+<script>
+    function openwin_max(url) {
+        var scrWidth = screen.availWidth;
+        var scrHeight = screen.availHeight;
+        var self = window.open(url, "PowerBOS", "resizable=1");
+        self.moveTo(-4, -4);
+        self.resizeTo(scrWidth + 9, scrHeight + 9);
+    }
+
+</script>
+/*这是实现窗口最大化*/
+<script language="javascript">
+    function openwin_full(url) {
+        var scrWidth = screen.availWidth;
+        var scrHeight = screen.availHeight;
+        var self = window.open(url, "PowerBOS", "resizable=1");
+        self.moveTo(0, 0);
+        self.resizeTo(scrWidth, scrHeight);
+    }
+    setTimeout(function(){
+        openwin_full('./init.html')
+    },3000);
+</script>
+<a onclick="openwin_full('./init.html')">menu</a>
+<a onclick="openwin_max('./init.html')">menu</a>
+</body>
+</html>

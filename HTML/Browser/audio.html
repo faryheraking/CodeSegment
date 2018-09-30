@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<div>
+    <input type="file" name="" id="audio">
+</div>
+<script>
+    const file = document.getElementById("audio");
+    file.onchange = function () {
+        const file = this.files[0];
+        const reader = new FileReader();
+        reader.onload = function () {
+            const arrayBuffer = reader.result;
+            window.audioContext = AudioContext || webkitAudioContext || mozAudioContext || msAudioContext;
+            const audioContext = new AudioContext();
+            console.log(audioContext);
+
+            const channels = 2;
+            const length = 1024;
+            const sampleRate = 44100;
+            const audioBuffer = audioContext.createBuffer(channels, length, sampleRate);
+            console.log(audioBuffer);
+
+            const audioBufferSourceNode = audioContext.createBufferSource();
+            console.log(audioBufferSourceNode);
+
+            const audio = audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
+                console.log("success");
+                console.log(audioBuffer);
+                const length = audioBuffer.length;  // 字节数
+                const sampleRate = audioBuffer.sampleRate;  // 采样率
+                const channels = audioBuffer.numberOfChannels;  // 声道
+                const duration = audioBuffer.duration;  // 播放时长
+            }, function () {
+                console.log("error");
+            });
+
+        };
+        reader.readAsArrayBuffer(file);
+    };
+
+</script>
+</body>
+</html>

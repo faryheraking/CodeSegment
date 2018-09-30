@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="../../jQuery/jquery-3.1.0.min.js"></script>
+</head>
+<body>
+<p>没有内容不执行吗</p>
+<a href="init.html">跳转</a>
+<script>
+    var state = null;
+    var url = "";
+
+    /*
+     * 加载执行1
+     */
+    window.onload = function () {
+        localStorage.setItem("onload", "load");
+        state = {title: document.title, url: location.href};
+        url = location.href;
+        history.pushState(state, "", url);
+    };
+
+    /*
+     * 加载执行2
+     */
+    window.onpageshow = function (e) {
+        localStorage.setItem("pageshow", JSON.stringify(e));
+    };
+
+    /*
+     * 退出执行1
+     * 只有点后退前进按钮触发
+     */
+    window.onpopstate = function (e) {
+        localStorage.setItem("onpopstate", "popstate" + "/" + JSON.stringify(e.state));
+        if(confirm("您有未保存的内容，请保存后退出")) {
+            history.back(-1);
+            console.dir(e);
+        } else {
+            history.pushState(state, "", url);
+        }
+    };
+    /*
+     * 退出执行2
+     */
+    window.onbeforeunload = function (evt) {
+         localStorage.setItem("onbeforeunload", "beforeunload");
+         evt.returnValue = "确认退出吗";
+    };
+    /*
+     * 退出执行3
+     */
+    window.onunload = function (evt) {
+        localStorage.setItem("onunload", "unload");
+        evt.returnValue = "确认退出吗";
+    };
+    /*document.addEventListener("visibilitychange",function(){
+     //切换到当前标签时触发
+     })*/
+    /*
+     * 同页面hash变化触发
+     */
+    window.addEventListener("hashchange", function () {
+        localStorage.setItem("haschange", "111");
+        console.log(ee.oldURL, ee.newURL);
+        debugger;
+    });
+    /*
+     * 根本不会触发
+     */
+    window.onclose = function () {
+        localStorage.setItem("close", true);
+        alert(1);
+    };
+
+</script>
+</body>
+</html>

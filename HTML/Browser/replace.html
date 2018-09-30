@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+<script>
+    var str="name=123&age=4565";
+    str.replace(/(\w+)(?:=([^&]*)?)/g,function(m,a,b,c,d){
+        console.log(m);  // 匹配内容
+        console.log(a);  // 第一个子表达式
+        console.log(b);  // 第二个子表达式
+        console.log(c);  // 匹配内容的索引
+        console.log(d);  // 匹配的字符串
+    });
+</script>
+</body>
+</html>
