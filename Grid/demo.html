@@ -1,0 +1,89 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <link rel="stylesheet" href="jquery.gridster.css">
+    <!--<script src="../jQuery/jquery-3.1.0.min.js"></script>-->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jquery/1.7.1/jquery.min.js"></script>
+    <script src="jquery.gridster.js"></script>
+
+    <style>
+        .container {background: #CCCCCC;}
+        *, html, body {margin: 0;padding: 0;}
+        li {outline: 1px dashed red;float: left;list-style: none;}
+        .drag {border: 1px dotted green;}
+    </style>
+</head>
+<body>
+<div class="container">
+    <ul>
+        <li data-row="1" data-col="1" data-sizex="1" data-sizey="1">
+            <p class="drag">Title</p>
+            <div></div>
+        </li>
+        <li data-row="1" data-col="2" data-sizex="1" data-sizey="1">
+            <p class="drag">Title</p>
+            <div></div>
+        </li>
+        <li data-row="1" data-col="3" data-sizex="1" data-sizey="1">
+            <p class="drag">Title</p>
+            <div></div>
+        </li>
+        <li data-row="2" data-col="2" data-sizex="1" data-sizey="1">
+            <p class="drag">Title</p>
+            <div></div>
+        </li>
+        <li data-row="2" data-col="3" data-sizex="1" data-sizey="1">
+            <p class="drag">Title</p>
+            <div></div>
+        </li>
+        <li data-row="2" data-col="3" data-sizex="1" data-sizey="1">
+            <p class="drag">Title</p>
+            <div></div>
+        </li>
+    </ul>
+
+</div>
+<script>
+    $(function () {
+        /*var gridster=new Gridster($(".container"),{
+         min_cols:2
+         });*/
+        var gridster = $(".container ul").gridster({
+            widget_margins: [0, 0],
+            autogrow_cols: false,  // 是否允许列自增
+            max_size_x: 3, // 部件占最大列数
+            min_cols: 1,  // 部件最小尺寸
+            max_cols: 5,  // 部件最大尺寸
+            min_rows: 5,
+            widget_base_dimensions: [300, 150],  // 部件尺寸
+            avoid_overlapped_widgets: true,  // 禁止部件重叠
+            scroll_container: document.body,
+            draggable: {
+                handle: ".drag",
+                start: function (event, ui) {
+                    $(event.target).css({left: ui.pointer.left + "px", top: ui.pointer.top + "px"});
+                },
+                drag: function (event, ui) {
+                },
+                stop: function (event, ui) {
+
+                }
+            },
+            resize: {
+                enabled: true,
+                axes: ["x"]
+            }
+        }).data('gridster');
+
+        gridster.enable();
+    });
+
+
+</script>
+</body>
+</html>
