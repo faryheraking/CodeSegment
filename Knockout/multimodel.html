@@ -1,0 +1,143 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="knockout-3.4.2.js"></script>
+</head>
+<body>
+<div>
+    <!-- ko if:showCB -->
+    <my-person params="name:'超宝',work:'程序员'"></my-person>
+    <!-- /ko -->
+    <!-- ko ifnot:showCB -->
+    <my-person params="name:people.name,work:work.set"></my-person>
+    <!-- /ko -->
+    <ul data-bind="foreach:persons">
+        <li><span data-bind="text:name"></span>：<span data-bind="text:work"></span></li>
+    </ul>
+    <input type="button" value="+添加" data-bind="click:add">
+    <my-factory params="name:'素强'"></my-factory>
+    <component-test params="name:'刘强',work:'程序员'"></component-test>
+    <task-test params="name:'xxx'"></task-test>
+    <div data-bind='component:{name:"task-test",params:{name:"task-param"}'></div>
+    <!-- ko component:{ name:'task-test', params:{name:'task-param'} -->
+    <!-- /ko -->
+</div>
+<!-- template元素创建组件模板 -->
+<template id="template-test">
+    <p data-bind="text:name"></p>
+    <p data-bind="text:work"></p>
+    <my-person params="name:name,work:work"></my-person>
+</template>
+
+<script>
+    const People = function (name) {
+        this.name = ko.observable(name);
+    };
+    const Work = function (work) {
+        this.set = ko.observable(work);
+    };
+    const Person = function (name, work) {
+        this.showCB = ko.observable(false);
+        this.people = new People(name);
+        this.work = new Work(work);
+        this.persons = ko.observableArray([
+            {name: name, work: work}
+        ]);
+    };
+
+    Person.prototype.add = function () {
+        this.persons.push({
+            name: "孙岩", work: "程序员"
+        });
+    };
+    ko.components.register("task-test", {
+        viewModel: function (params) {
+            console.log(params.name);
+            this.name = params.name;
+        },
+        template: '<p data-bind="text:name"></p>'
+    });
+    /*
+     * ko.components.register(component-name,component-option)
+     * @param component-name 短线分隔名称
+     * @param component-option 包含viewModel、template
+     * @option viewModel 绑定视图模型
+     * @option template 绑定模板
+     */
+    ko.components.register("my-person", {
+        viewModel: function (params) {
+            this.name = params.name;
+            this.work = params.work;
+        },
+        template: '<p data-bind="text:name"></p>\
+                  <p data-bind="text:work"></p>'
+    });
+
+    ko.components.register("my-factory", {
+        viewMode: {
+            createViewModel: function (params, componentInfo) {
+                window.console.log(componentInfo.element);
+                window.console.log(componentInfo.templateNodes);
+                return new People(params.name);
+            }
+        },
+        template: '<p data-bind="text:name"></p>'
+    });
+
+    /* 分离的视图模型与模板 */
+    function ViewModelTest(params) {
+        this.name = ko.observable(params.name);
+        this.work = ko.observable(params.work);
+    }
+
+    ko.components.register("component-test", {
+        /*
+         * 每个组件实例绑定独立的视图模型，如果希望共享
+         * viewModel:{instance:myViewModel}，但不推荐这样做
+         */
+        viewModel: ViewModelTest,
+        /*
+         * 绑定视图模板，使用template元素id
+         */
+        template: {element: 'template-test'}
+    });
+
+    var josn = ko.toJSON(new Person("高启祥", "测试"));
+    var josnO = ko.toJS(new Person("高启祥", "测试"));
+
+    console.dir(josnO);
+
+    /* 微任务 */
+    var task1 = ko.tasks.schedule(function () {
+        setTimeout(function () {
+            alert(111);
+        });
+
+    });
+    var task2 = ko.tasks.schedule(function () {
+        throw new Error("error");
+        setTimeout(function () {
+            alert(222);
+        },1500);
+    });
+    var task3 = ko.tasks.schedule(function () {
+        setTimeout(function () {
+            alert(333);
+        },500);
+    });
+    ko.tasks.cancel(task1);
+
+    ko.onerror=function(){
+        alert("error");
+    };
+
+    ko.applyBindings(new Person("曹亮", "程序员"));
+</script>
+
+</body>
+</html>

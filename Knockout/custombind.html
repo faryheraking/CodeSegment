@@ -1,0 +1,47 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>自定义绑定</title>
+    <script src="knockout-3.4.2.js"></script>
+</head>
+<body>
+<div>
+    <div data-bind="person:{name:'超宝',work:'程序员'}">
+        <p data-bind="text:pname"></p>
+        <p data-bind="text:pwork"></p>
+    </div>
+</div>
+<script>
+
+    function myViewModel() {
+        var self = this;
+
+        this.pname = ko.observable();
+        this.pwork = ko.observable();
+
+        ko.bindingHandlers.person = {
+            init: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+                var props = valueAccessor();
+                viewModel.pname(props.name);
+                viewModel.pwork(props.work);
+                props = allBindings.get("person");
+                console.log(props);
+
+            },
+            update: function (element, valueAccessor, allBindings, viewModel, bindingContext) {
+
+            }
+        };
+
+    }
+
+
+    ko.applyBindings(new myViewModel());
+</script>
+
+</body>
+</html>

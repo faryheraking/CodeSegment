@@ -1,0 +1,68 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="jquery-1.7.1.min.js"></script>
+    <script src="jquery.livequery.js"></script>
+    <script src="knockout-3.4.2.js"></script>
+    <script src="knockout.multimodels-0.1.js"></script>
+</head>
+<body>
+<!-- 组件 -->
+<div data-model="component">
+    <p data-bind="text:markName"></p>
+    <my-mark params="{name:markName}"></my-mark>
+    <my-mark params="{name:markName}"></my-mark>
+    <my-com></my-com>
+    <my-com></my-com>
+</div>
+<script>
+    const VM1 = function () {
+        this.markName = ko.observable("mark");
+    };
+
+    ko.components.register("my-mark", {
+        viewModel: function (params) {
+            // property
+            this.comName = ko.observable(params.name);
+            // behavior
+            this.getName = function () {
+                return this.comName();
+            }.bind(this);
+            this.setName = function (name) {
+                this.comName(name);
+            }.bind(this);
+            this.changeName = function () {
+                this.setName("mmm-mark");
+            }.bind(this);
+        },
+        template: '<div>\
+                          <p data-bind="text:comName()"></p>\
+                          <input type="text" data-bind="textInput:comName()">\
+                          <p data-bind="click:changeName">改变</p>\
+                        </div>'
+    });
+
+    // 共享Model
+    const comViewModel = {
+        name: ko.observable("front"),
+        changeName: function () {
+            this.name("back");
+        }
+    };
+    ko.components.register("my-com", {
+        viewModel: {instance: comViewModel},
+        template: '<div>\
+                        <p data-bind="text:name"></p>\
+                        <p data-bind="click:changeName">改变</p>\
+                      </div>'
+    });
+
+    ko.attach("component", new VM1());
+</script>
+</body>
+</html>

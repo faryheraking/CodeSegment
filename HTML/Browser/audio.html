@@ -10,26 +10,38 @@
 <body>
 <div>
     <input type="file" name="" id="audio">
+    <input type="button" value="play" id="play">
+    <input type="button" value="stop" id="stop">
+    <audio src="audio.mp3" id="audio-element"></audio>
 </div>
 <script>
     const file = document.getElementById("audio");
+    const play = document.getElementById("play");
+    const stop = document.getElementById("stop");
+
     file.onchange = function () {
         const file = this.files[0];
         const reader = new FileReader();
         reader.onload = function () {
             const arrayBuffer = reader.result;
+
             window.audioContext = AudioContext || webkitAudioContext || mozAudioContext || msAudioContext;
             const audioContext = new AudioContext();
             console.log(audioContext);
+            const currentTime = audioContext.currentTime;  // 设备播放时间
+            const destination = audioContext.destination;  // 目标设备
+            const sampleRate = audioContext.sampleRate;  // 采样率
+            const state = audioContext.state;  // 当前状态
+
+            audioContext.onstatechange = function () {
+                console.log("state has changed");
+            };
 
             const channels = 2;
             const length = 1024;
-            const sampleRate = 44100;
             const audioBuffer = audioContext.createBuffer(channels, length, sampleRate);
             console.log(audioBuffer);
 
-            const audioBufferSourceNode = audioContext.createBufferSource();
-            console.log(audioBufferSourceNode);
 
             const audio = audioContext.decodeAudioData(arrayBuffer, function (audioBuffer) {
                 console.log("success");
@@ -38,6 +50,41 @@
                 const sampleRate = audioBuffer.sampleRate;  // 采样率
                 const channels = audioBuffer.numberOfChannels;  // 声道
                 const duration = audioBuffer.duration;  // 播放时长
+
+                const destination = audioContext.destination;
+
+                const analyser = audioContext.createAnalyser();  // 分析器
+                analyser.fftSize = 512;
+                analyser.getFloatTimeDomainData(new Float32Array(analyser.fftSize));
+                console.log(analyser);
+                analyser.connect(destination);
+
+                const audioBufferSourceNode = audioContext.createBufferSource();  // 文件音频源
+                console.log(audioBufferSourceNode);
+                audioBufferSourceNode.buffer = audioBuffer;
+                audioBufferSourceNode.connect(destination);
+
+                audioBufferSourceNode.connect(analyser);
+
+                let isPlayed = false;
+                play.onclick = function () {
+                    if(isPlayed) {
+                        return;
+                    }
+                    audioBufferSourceNode.start(0);
+                    isPlayed = true;
+                };
+                stop.onclick = function () {
+                    audioBufferSourceNode.stop();
+                };
+
+                const audio = document.getElementById("audio-element");
+                const mediaElementAudioSourceNode = audioContext.createMediaElementSource(audio);  // H5标签音频源
+                console.log(mediaElementAudioSourceNode);
+
+                const mediaStream = audioContext.createMediaStreamSource();
+
+
             }, function () {
                 console.log("error");
             });
