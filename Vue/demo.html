@@ -1,0 +1,115 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue.js"></script>
+    <script src="es6-promise.auto.js"></script>
+    <script src="vuex.js"></script>
+</head>
+<body>
+<div id="app"></div>
+<script>
+    const moduleA = {
+        // 确保所有状态变更都是由提交mutation引起，但有较高性能损耗
+        // 生产环境需要关闭
+        strict: true,
+        state: function () {
+            return {
+                count: 0
+            };
+        },
+        mutations: {
+            add: function (state) {
+                /*
+                 * state 模块局部状态
+                 */
+                state.count++;
+            }
+        },
+        actions: {
+            add: function (context) {
+                /*
+                 * context.rootState
+                 * context.state 模块局部状态
+                 * context.commit
+                 * context.dispatch
+                 * context.getters
+                 * context.rootGetters
+                 */
+                context.commit("add");
+            }
+        },
+        getters: {
+            counts: function (state, getters, rootState, rootGetters) {
+                /*
+                 * state 模块局部状态
+                 * getters
+                 * rootStatef
+                 * rootGetters
+                 */
+                return state.count;
+            }
+        }
+    };
+    const moduleB = {
+        strict: false,
+        state: function () {
+            const state = {
+                count: 0,
+                username: ""
+            };
+            return state;
+        },
+        mutations: {
+            username: function (state, payload) {
+                state.username = payload;
+            }
+        },
+        actions: {
+            changeUserName: function (context, payload) {
+                context.commit("username", payload);
+            }
+        },
+        getters: {
+            username: function (state, getters, rootState, rootGetters) {
+                return state.username;
+            }
+        }
+    };
+    const store = new Vuex.Store({
+        modules: {
+            namespaced: true,
+            a: moduleA,
+            b: moduleB
+        }
+    });
+    //const state = store.state.b;
+    //const count = store.getters.counts;
+    const vm = new Vue({
+        el: "#app",
+        store: store,
+        template: '<div id="app" @click="add"><p>{{counts}}</p><p>{{username}}</p><p><input type="text" :value="username" @change="changeUserName($event)"></p></div>',
+        computed: {
+            counts: function () {
+                return this.$store.getters.counts;
+            },
+            username: function () {
+                return this.$store.getters.username;
+            }
+        },
+        methods: {
+            add: function () {
+                this.$store.dispatch("add");
+            },
+            changeUserName: function (e) {
+                this.$store.dispatch("changeUserName", e.target.value);
+            }
+        }
+    });
+</script>
+</body>
+</html>

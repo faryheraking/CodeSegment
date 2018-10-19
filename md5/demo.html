@@ -1,0 +1,45 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport"
+          content="width=device-width, user-scalable=no, initial-scale=1.0, maximum-scale=1.0, minimum-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>md5</title>
+    <script src="md5.min.js"></script>
+</head>
+<body>
+<script>
+    var text = "";
+    md5(''); // d41d8cd98f00b204e9800998ecf8427e
+    md5('The quick brown fox jumps over the lazy dog'); // 9e107d9d372bb6826bd81d3542a419d6
+    md5('The quick brown fox jumps over the lazy dog.'); // e4d909c290d0fb1ca068ffaddf22cbd0
+
+    // It also supports UTF-8 encoding
+    md5('中文'); // a7bac2239fcdcb3a067903d8077c4a07
+
+    // It also supports byte `Array`, `Uint8Array`, `ArrayBuffer`
+    md5([]); // d41d8cd98f00b204e9800998ecf8427e
+    md5(new Uint8Array([])); // d41d8cd98f00b204e9800998ecf8427e
+
+    // Different output
+    md5(''); // d41d8cd98f00b204e9800998ecf8427e
+    md5.hex(''); // d41d8cd98f00b204e9800998ecf8427e
+    md5.array(''); // [212, 29, 140, 217, 143, 0, 178, 4, 233, 128, 9, 152, 236, 248, 66, 126]
+    md5.digest(''); // [212, 29, 140, 217, 143, 0, 178, 4, 233, 128, 9, 152, 236, 248, 66, 126]
+    md5.arrayBuffer(''); // ArrayBuffer
+    md5.buffer(''); // ArrayBuffer, deprecated, This maybe confuse with Buffer in node.js. Please use arrayBuffer instead.
+    md5.base64(''); // 1B2M2Y8AsgTpgAmY7PhCfg==
+</script>
+<script>
+    /*
+    * 更新
+    */
+    var text = "123456";
+    var re0 = md5(text);
+    var hash = md5.create();
+    hash.update("11");
+    var re = hash.hex();
+</script>
+</body>
+</html>
